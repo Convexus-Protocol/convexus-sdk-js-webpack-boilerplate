@@ -1,0 +1,218 @@
+[
+    {
+        "inputs": [
+            {
+                "indexed": "0x1",
+                "name": "zeroAddress",
+                "type": "Address"
+            },
+            {
+                "indexed": "0x1",
+                "name": "caller",
+                "type": "Address"
+            }
+        ],
+        "name": "OwnerChanged",
+        "type": "eventlog"
+    },
+    {
+        "inputs": [
+            {
+                "indexed": "0x1",
+                "name": "fee",
+                "type": "int"
+            },
+            {
+                "indexed": "0x1",
+                "name": "tickSpacing",
+                "type": "int"
+            }
+        ],
+        "name": "FeeAmountEnabled",
+        "type": "eventlog"
+    },
+    {
+        "inputs": [
+            {
+                "indexed": "0x1",
+                "name": "token0",
+                "type": "Address"
+            },
+            {
+                "indexed": "0x1",
+                "name": "token1",
+                "type": "Address"
+            },
+            {
+                "indexed": "0x1",
+                "name": "fee",
+                "type": "int"
+            },
+            {
+                "name": "tickSpacing",
+                "type": "int"
+            },
+            {
+                "name": "pool",
+                "type": "Address"
+            }
+        ],
+        "name": "PoolCreated",
+        "type": "eventlog"
+    },
+    {
+        "inputs": [
+            {
+                "name": "tokenA",
+                "type": "Address"
+            },
+            {
+                "name": "tokenB",
+                "type": "Address"
+            },
+            {
+                "name": "fee",
+                "type": "int"
+            }
+        ],
+        "name": "createPool",
+        "outputs": [
+            {
+                "type": "Address"
+            }
+        ],
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "name": "_owner",
+                "type": "Address"
+            }
+        ],
+        "name": "setOwner",
+        "outputs": [],
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "name": "fee",
+                "type": "int"
+            },
+            {
+                "name": "tickSpacing",
+                "type": "int"
+            }
+        ],
+        "name": "enableFeeAmount",
+        "outputs": [],
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "name": "contractBytes",
+                "type": "bytes"
+            }
+        ],
+        "name": "setPoolContract",
+        "outputs": [],
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "name",
+        "outputs": [
+            {
+                "type": "str"
+            }
+        ],
+        "readonly": "0x1",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "owner",
+        "outputs": [
+            {
+                "type": "Address"
+            }
+        ],
+        "readonly": "0x1",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "poolContract",
+        "outputs": [
+            {
+                "type": "bytes"
+            }
+        ],
+        "readonly": "0x1",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "poolsSize",
+        "outputs": [
+            {
+                "type": "int"
+            }
+        ],
+        "readonly": "0x1",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "name": "index",
+                "type": "int"
+            }
+        ],
+        "name": "pools",
+        "outputs": [
+            {
+                "type": "Address"
+            }
+        ],
+        "readonly": "0x1",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "name": "token0",
+                "type": "Address"
+            },
+            {
+                "name": "token1",
+                "type": "Address"
+            },
+            {
+                "name": "fee",
+                "type": "int"
+            }
+        ],
+        "name": "getPool",
+        "outputs": [
+            {
+                "type": "Address"
+            }
+        ],
+        "readonly": "0x1",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "parameters",
+        "outputs": [
+            {
+                "type": "dict"
+            }
+        ],
+        "readonly": "0x1",
+        "type": "function"
+    }
+]
