@@ -10,7 +10,7 @@ import {arrayFilterEmpty} from './utils/helpers';
 
 export default {
     context: __dirname,
-    target: isDevServer ? 'web' : ['web', 'esnext'],
+    target: isDevServer ? 'web' : ['web', 'es6'],
     mode: isProd ? 'production' : 'development',
     entry,
     output: {
