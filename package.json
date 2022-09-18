@@ -22,6 +22,7 @@
         "post-commit": "git update-index --again"
     },
     "dependencies": {
+        "@convexus/icon-toolkit": "*",
         "@convexus/sdk": "*",
         "@types/classnames": "^2.3.0",
         "@types/react": "^17.0.38",
@@ -29,7 +30,9 @@
         "classnames": "^2.3.1",
         "normalize.css": "^8.0.1",
         "react": "^17.0.2",
-        "react-dom": "^17.0.2"
+        "react-dom": "^17.0.2",
+        "react-icons": "^4.4.0",
+        "react-router-hash-link": "^2.4.3"
     },
     "devDependencies": {
         "@babel/core": "~7.16.7",
@@ -46,6 +49,7 @@
         "@pmmmwh/react-refresh-webpack-plugin": "~0.5.4",
         "@svgr/webpack": "~6.1.2",
         "@teamsupercell/typings-for-css-modules-loader": "~2.5.1",
+        "@types/react-router-hash-link": "^2.4.5",
         "autoprefixer": "~10.4.2",
         "babel-loader": "~8.2.3",
         "clean-webpack-plugin": "~4.0.0",
