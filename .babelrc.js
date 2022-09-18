@@ -1,6 +1,5 @@
-
 module.exports = (api) => {
-    const mode = process.env.NODE_ENV ?? 'production';
+    const mode = process.env.NODE_ENV ? process.env.NODE_ENV : 'production';
 
     // This caches the Babel config by environment.
     api.cache.using(() => mode);
