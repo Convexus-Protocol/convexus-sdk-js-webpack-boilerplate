@@ -22,7 +22,7 @@ export function ModuleCreateAndInitializePoolIfNecessary() {
             />
 
             <p>
-                Token A address:{' '}
+                Token A address:
                 <input
                     className={styles.inputAddress}
                     ref={tokenARef}
@@ -31,7 +31,7 @@ export function ModuleCreateAndInitializePoolIfNecessary() {
                 ></input>
             </p>
             <p>
-                Token B address:{' '}
+                Token B address:
                 <input
                     className={styles.inputAddress}
                     ref={tokenBRef}
@@ -40,7 +40,7 @@ export function ModuleCreateAndInitializePoolIfNecessary() {
                 ></input>
             </p>
             <p>
-                Fee:{' '}
+                Fee:
                 <input ref={feeRef} type="number" defaultValue="500"></input>
             </p>
 

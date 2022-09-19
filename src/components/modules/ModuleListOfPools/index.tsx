@@ -22,7 +22,7 @@ export const ModuleListOfPools = () => {
             <p>Pools addresses:</p>
             {poolsState.map((poolAddress, i) => (
                 <p key={i}>
-                    -{' '}
+                    -
                     <a
                         href={
                             'https://tracker.berlin.icon.community/contract/' +

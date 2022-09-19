@@ -1,0 +1,25 @@
+{
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+
+  "settings": {
+    "files.exclude": {
+      "**/dist": true,
+      "**/node_modules": true,
+      "**/package-lock.json": true,
+      "**/tsconfig.tsbuildinfo": true,
+      "**/*.lock": true,
+      "**/*.map": true
+    },
+	},
+	
+  "extensions": {
+    "recommendations": [
+      "dbaeumer.vscode-eslint",
+      "orta.vscode-jest",
+    ],
+  }
+}
