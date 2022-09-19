@@ -23,9 +23,7 @@ export function ModuleHeader({name, text, link}: ModuleHeaderProps) {
                     href={
                         'https://github.com/Convexus-Protocol/convexus-sdk-js-webpack-boilerplate/blob/main/src/components/modules/' +
                         name +
-                        '/' +
-                        name +
-                        '.tsx'
+                        '/index.tsx'
                     }
                 >
                     <AiFillGithub size={40} />

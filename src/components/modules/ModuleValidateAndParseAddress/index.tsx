@@ -10,7 +10,7 @@ export const ModuleValidateAndParseAddress = () => (
     <div className={appStyles.module} id="ModuleValidateAndParseAddress">
         <ModuleHeader
             text={'Validate an Address'}
-            name={'validateAndParseAddress'}
+            name={'ModuleValidateAndParseAddress'}
             link="https://github.com/Convexus-Protocol/convexus-sdk-js-webpack-boilerplate/blob/main/src/components/modules/createAndInitializePoolIfNecessary/ModuleCreateAndInitializePoolIfNecessary.tsx"
         />
         <div>
