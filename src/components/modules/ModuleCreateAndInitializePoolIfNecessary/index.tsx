@@ -69,7 +69,7 @@ export function ModuleCreateAndInitializePoolIfNecessary() {
 
             {txHashResult && (
                 <p>
-                    TxHash:{' '}
+                    TxHash:
                     <a
                         href={
                             'https://tracker.berlin.icon.community/transaction/' +
