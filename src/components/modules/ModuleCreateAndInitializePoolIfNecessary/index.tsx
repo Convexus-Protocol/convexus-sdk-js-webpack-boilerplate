@@ -43,10 +43,6 @@ export function ModuleCreateAndInitializePoolIfNecessary() {
                 Fee:{' '}
                 <input ref={feeRef} type="number" defaultValue="500"></input>
             </p>
-            <p>
-                Pool Price:{' '}
-                <input ref={feeRef} type="number" defaultValue="500"></input>
-            </p>
 
             <p>
                 <button
