@@ -12,4 +12,6 @@ coverage
 devTestOnly/
 *.lock
 package-lock.json
+
+!./src/@types/declarations.d.ts
 *.d.ts
