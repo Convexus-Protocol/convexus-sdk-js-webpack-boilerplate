@@ -1,6 +1,6 @@
 import {Pool} from '@convexus/sdk';
 import React from 'react';
-import * as styles from './ModuleInstancePool.module.less';
+import * as styles from './styles.module.less';
 
 interface PoolInfoInterface {
     pool: Pool;

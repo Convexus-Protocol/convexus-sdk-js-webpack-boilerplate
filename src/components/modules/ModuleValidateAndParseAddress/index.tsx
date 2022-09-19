@@ -1,7 +1,7 @@
 import React from 'react';
-import {ParseResult} from './utils/ParseResult';
+import {ParseResult} from './ParseResult';
 import * as appStyles from '@components/app/app.module.less';
-import {ModuleHeader} from '@components/utils/ModuleHeader';
+import {ModuleHeader} from '@components/modules/ModuleHeader';
 
 const validAddress = 'hx0123456789012345678901234567890123456789';
 const invalidAddress = 'hx01234567890';

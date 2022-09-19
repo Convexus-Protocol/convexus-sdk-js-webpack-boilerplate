@@ -12,3 +12,4 @@ coverage
 devTestOnly/
 *.lock
 package-lock.json
+*.d.ts

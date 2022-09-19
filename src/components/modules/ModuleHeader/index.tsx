@@ -1,7 +1,7 @@
 import React from 'react';
 import {BsLink45Deg} from 'react-icons/bs';
 import {AiFillGithub} from 'react-icons/ai';
-import * as styles from './ModuleHeader.module.less';
+import * as styles from './styles.module.less';
 
 export interface ModuleHeaderProps {
     name: string;

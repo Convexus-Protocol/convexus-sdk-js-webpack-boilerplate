@@ -1,6 +1,6 @@
 import {validateAndParseAddress} from '@convexus/icon-toolkit';
 import React from 'react';
-import * as styles from '../ModuleValidateAndParseAddress.module.less';
+import * as styles from './styles.module.less';
 
 export function ParseResult({address}: any) {
     let result;

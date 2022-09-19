@@ -1,7 +1,7 @@
 import React, {useRef, useState} from 'react';
 
 import {Pool} from '@convexus/sdk';
-import * as styles from './ModuleInstancePool.module.less';
+import * as styles from './styles.module.less';
 import * as appStyles from '@components/app/app.module.less';
 import {instanciatePool} from './utils/instanciatePool';
 import {PoolInfo} from './PoolInfo';

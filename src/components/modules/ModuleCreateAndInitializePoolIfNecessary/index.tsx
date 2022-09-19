@@ -13,7 +13,7 @@ import {
     debugService,
     networkId,
 } from '@components/utils/getProviders';
-import * as styles from './ModuleCreateAndInitializePoolIfNecessary.module.less';
+import * as styles from './styles.module.less';
 
 const poolInitializerAddress = 'cxbb201b891324246a2c35fbcfb3db67145ab12b3a';
 const poolInitializerContract = new Contract(
