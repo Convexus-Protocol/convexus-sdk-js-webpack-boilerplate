@@ -6,10 +6,9 @@ import * as styles from './styles.module.less';
 export interface ModuleHeaderProps {
     name: string;
     text: string;
-    link: string;
 }
 
-export function ModuleHeader({name, text, link}: ModuleHeaderProps) {
+export function ModuleHeader({name, text}: ModuleHeaderProps) {
     return (
         <>
             <div className={styles.container}>

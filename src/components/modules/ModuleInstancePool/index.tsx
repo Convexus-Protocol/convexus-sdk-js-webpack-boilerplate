@@ -5,6 +5,7 @@ import * as styles from './styles.module.less';
 import * as appStyles from '@components/app/app.module.less';
 import {instanciatePool} from './utils/instanciatePool';
 import {PoolInfo} from './PoolInfo';
+import {ModuleHeader} from '../ModuleHeader';
 
 export function ModuleInstancePool() {
     const inputRef = useRef<any>();
@@ -12,9 +13,10 @@ export function ModuleInstancePool() {
 
     return (
         <div className={appStyles.module} id="ModuleInstancePool">
-            <h1>
-                <pre>Instanciate a new Pool object</pre>
-            </h1>
+            <ModuleHeader
+                text={'Instanciate a new Pool object'}
+                name={'ModuleInstancePool'}
+            />
             <div className={styles.poolContainer}>
                 <input
                     ref={inputRef}
