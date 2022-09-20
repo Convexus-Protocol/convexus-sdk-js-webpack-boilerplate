@@ -1,0 +1,380 @@
+import React, {useRef, useState} from 'react';
+import JSBI from 'jsbi';
+
+import * as appStyles from '@components/app/app.module.less';
+import * as styles from './styles.module.less';
+import {ModuleHeader} from '../ModuleHeader';
+import {Contract} from '@convexus/icon-toolkit';
+import {CurrencyAmount, Token, Percent, MaxUint256} from '@convexus/sdk-core';
+import {NonfungiblePositionManager, Pool, Position} from '@convexus/sdk';
+import {getPoolFromAddress} from '@src/components/utils/contract/ConvexusPool/getPoolFromAddress';
+import {getUserWallet} from '@src/components/utils/contract/getUserWallet';
+import {getBalanceOfToken} from '@src/components/utils/contract/Token/getBalanceOfToken';
+import {tryParseTick} from '@src/components/utils/parse/tryParseTick';
+import tryParseCurrencyAmount from '@src/components/utils/parse/tryParseCurrencyAmount';
+import INonfungiblePositionManager from '@src/artifacts/contracts/NonfungiblePositionManager/NonfungiblePositionManager.json';
+import bigDecimal from 'js-big-decimal';
+import {
+    iconService,
+    debugService,
+    networkId,
+} from '@components/utils/contract/getProviders';
+
+export const nonfungiblePositionManagerAddress =
+    'cx468042ae19c14a3a1b7f30794024dbbdc220fce4';
+
+export const nonfungiblePositionManagerContract = new Contract(
+    nonfungiblePositionManagerAddress,
+    INonfungiblePositionManager,
+    iconService,
+    debugService,
+    networkId,
+);
+
+export function ModuleAddLiquidity() {
+    const [pool, setPool] = useState<Pool>();
+    const [balances, setBalances] = useState<CurrencyAmount<Token>[]>();
+    const poolAddressRef = useRef<any>();
+    const lowerBoundRef = useRef<any>();
+    const upperBoundRef = useRef<any>();
+    const amount0Ref = useRef<any>();
+    const amount1Ref = useRef<any>();
+    const wallet = getUserWallet();
+
+    function computeAmounts(fieldChanged: string) {
+        if (!pool) return;
+        if (!lowerBoundRef.current.value) return;
+        if (!upperBoundRef.current.value) return;
+
+        // Parse and manage lower / upper ticks
+        try {
+            const lowerBound = new bigDecimal(lowerBoundRef.current.value);
+            const upperBound = new bigDecimal(upperBoundRef.current.value);
+            const tickLower = tryParseTick(
+                pool.token0,
+                pool.token1,
+                pool.fee,
+                lowerBound.getValue(),
+            );
+            const tickUpper = tryParseTick(
+                pool.token0,
+                pool.token1,
+                pool.fee,
+                upperBound.getValue(),
+            );
+
+            // if upper bound is lower than pool price, disable amount0
+            if (tickUpper < pool.tickCurrent) {
+                amount0Ref.current.disabled = true;
+                amount0Ref.current.value = '';
+                return;
+            } else {
+                amount0Ref.current.disabled = false;
+            }
+
+            // if lower bound is greater than pool price, disable amount1
+            if (tickLower > pool.tickCurrent) {
+                amount1Ref.current.disabled = true;
+                amount1Ref.current.value = '';
+                return;
+            }
+            {
+                amount1Ref.current.disabled = false;
+            }
+        } catch (e) {
+            console.error(e);
+            return;
+        }
+
+        if (!amount0Ref.current.value || !amount1Ref.current.value) return;
+        if (fieldChanged == 'amount0' && !amount0Ref.current.value) return;
+        if (fieldChanged == 'amount1' && !amount1Ref.current.value) return;
+
+        // Parse and manage amounts
+        try {
+            const lowerBound = new bigDecimal(lowerBoundRef.current.value);
+            const upperBound = new bigDecimal(upperBoundRef.current.value);
+            const tickLower = tryParseTick(
+                pool.token0,
+                pool.token1,
+                pool.fee,
+                lowerBound.getValue(),
+            );
+            const tickUpper = tryParseTick(
+                pool.token0,
+                pool.token1,
+                pool.fee,
+                upperBound.getValue(),
+            );
+
+            // Look for the other amount
+            const amount0 =
+                fieldChanged == 'amount1'
+                    ? MaxUint256
+                    : tryParseCurrencyAmount(
+                          amount0Ref.current.value,
+                          pool.token0,
+                      ).quotient;
+            const amount1 =
+                fieldChanged == 'amount0'
+                    ? MaxUint256
+                    : tryParseCurrencyAmount(
+                          amount1Ref.current.value,
+                          pool.token1,
+                      ).quotient;
+
+            switch (fieldChanged) {
+                // amount0 changed, update amount1
+                case 'amount0':
+                    {
+                        const position = Position.fromAmount0({
+                            pool: pool,
+                            tickLower,
+                            tickUpper,
+                            amount0: amount0,
+                            useFullPrecision: true,
+                        });
+                        amount1Ref.current.value =
+                            position.amount1.toSignificant();
+                    }
+                    break;
+
+                // amount1 changed, update amount0
+                case 'amount1':
+                    {
+                        const position = Position.fromAmount1({
+                            pool: pool,
+                            tickLower,
+                            tickUpper,
+                            amount1: amount1,
+                        });
+
+                        amount0Ref.current.value =
+                            position.amount0.toSignificant();
+                    }
+                    break;
+
+                // bounds changed, update amount0 and amount1
+                case 'lower':
+                case 'upper':
+                    {
+                        const position = Position.fromAmounts({
+                            pool: pool,
+                            tickLower: tickLower,
+                            tickUpper: tickUpper,
+                            amount0: amount0,
+                            amount1: amount1,
+                            useFullPrecision: true,
+                        });
+
+                        amount0Ref.current.value =
+                            position.amount0.toSignificant();
+                        amount1Ref.current.value =
+                            position.amount1.toSignificant();
+                    }
+                    break;
+            }
+        } catch (e) {
+            console.error(e);
+            return;
+        }
+    }
+
+    const onCreatePosition = async () => {
+        if (!pool) return;
+        if (!amount0Ref.current.value && !amount1Ref.current.value) return;
+        if (!lowerBoundRef.current.value) return;
+        if (!upperBoundRef.current.value) return;
+
+        const amount0 = amount0Ref.current.value
+            ? tryParseCurrencyAmount(amount0Ref.current.value, pool.token0)
+                  .quotient
+            : MaxUint256;
+        const amount1 = amount1Ref.current.value
+            ? tryParseCurrencyAmount(amount1Ref.current.value, pool.token1)
+                  .quotient
+            : MaxUint256;
+        const lowerBound = new bigDecimal(lowerBoundRef.current.value);
+        const upperBound = new bigDecimal(upperBoundRef.current.value);
+        const tickLower = tryParseTick(
+            pool.token0,
+            pool.token1,
+            pool.fee,
+            lowerBound.getValue(),
+        );
+        const tickUpper = tryParseTick(
+            pool.token0,
+            pool.token1,
+            pool.fee,
+            upperBound.getValue(),
+        );
+
+        let position;
+
+        // Handle one-sided liquidity
+        if (JSBI.equal(amount0, MaxUint256)) {
+            position = Position.fromAmount1({
+                pool: pool,
+                tickLower: tickLower,
+                tickUpper: tickUpper,
+                amount1: amount1,
+            });
+        } else if (JSBI.equal(amount0, MaxUint256)) {
+            position = Position.fromAmount0({
+                pool: pool,
+                tickLower: tickLower,
+                tickUpper: tickUpper,
+                amount0: amount0,
+                useFullPrecision: true,
+            });
+        } else {
+            position = Position.fromAmounts({
+                pool: pool,
+                tickLower: tickLower,
+                tickUpper: tickUpper,
+                amount0: amount0,
+                amount1: amount1,
+                useFullPrecision: true,
+            });
+        }
+        const wallet = getUserWallet();
+        const slippageTolerance = new Percent(1, 100);
+        const deadline = Date.now() + 60 * 10; // 10 minute deadline
+
+        NonfungiblePositionManager.setContractAddress(
+            nonfungiblePositionManagerAddress,
+        );
+        const calldatas = NonfungiblePositionManager.addCallParameters(
+            new Position({
+                pool: pool,
+                tickLower: tickLower,
+                tickUpper: tickUpper,
+                liquidity: position.liquidity,
+            }),
+            {
+                recipient: wallet.getAddress(),
+                slippageTolerance,
+                deadline,
+            },
+        );
+
+        // deposit tokens & mint the NFT position
+        console.log('Minting position...');
+        for (const calldata of calldatas) {
+            console.log('calldata=', calldata);
+            const txHash = await nonfungiblePositionManagerContract.buildSend(
+                wallet,
+                calldata,
+            );
+            console.log('txHash =', txHash);
+            await iconService.waitTransactionResult(txHash);
+        }
+    };
+
+    return (
+        <div className={appStyles.module} id="ModuleAddLiquidity">
+            <ModuleHeader
+                text={'Add liquidity to a pool'}
+                name={'ModuleAddLiquidity'}
+            />
+
+            <p>
+                Pool address:
+                <input
+                    ref={poolAddressRef}
+                    className={styles.input}
+                    type="text"
+                    defaultValue="cxe5d72412eb7a37a0ad72216089c177c92488b760"
+                />
+                <button
+                    onClick={() => {
+                        const poolAddress = poolAddressRef.current.value;
+                        getPoolFromAddress(poolAddress).then(async (pool) => {
+                            const balance0 = await getBalanceOfToken(
+                                pool.token0,
+                                wallet.getAddress(),
+                            );
+                            const balance1 = await getBalanceOfToken(
+                                pool.token1,
+                                wallet.getAddress(),
+                            );
+                            setPool(pool);
+                            setBalances([balance0, balance1]);
+                        });
+                    }}
+                >
+                    Load pool
+                </button>
+            </p>
+
+            {pool && balances && (
+                <>
+                    <p>
+                        Pool {pool.token0.symbol + ' / ' + pool.token1.symbol}
+                    </p>
+                    <p>Pool price: {pool.token0Price.toSignificant(10)}</p>
+
+                    <hr />
+
+                    <p>
+                        Lower bound price:
+                        <input
+                            onChange={() => computeAmounts('lower')}
+                            ref={lowerBoundRef}
+                            className={styles.input}
+                            defaultValue={pool.token0Price.asFraction
+                                .divide(2)
+                                .toSignificant(10)}
+                            type="number"
+                        />
+                    </p>
+
+                    <p>
+                        Upper bound price:
+                        <input
+                            onChange={() => computeAmounts('upper')}
+                            ref={upperBoundRef}
+                            className={styles.input}
+                            defaultValue={pool.token0Price.asFraction
+                                .multiply(2)
+                                .toSignificant(10)}
+                            type="number"
+                        />
+                    </p>
+
+                    <p>
+                        {pool.token0.symbol} amount (balance in wallet:{' '}
+                        {balances[0].toSignificant(10)}):
+                        <input
+                            onChange={() => computeAmounts('amount0')}
+                            ref={amount0Ref}
+                            className={styles.input}
+                            type="number"
+                        />
+                    </p>
+
+                    <p>
+                        {pool.token1.symbol} amount (balance in wallet:{' '}
+                        {balances[1].toSignificant(10)}):
+                        <input
+                            onChange={() => computeAmounts('amount1')}
+                            ref={amount1Ref}
+                            className={styles.input}
+                            type="number"
+                        />
+                    </p>
+
+                    <p>
+                        <button
+                            onClick={() => {
+                                onCreatePosition();
+                            }}
+                        >
+                            Create position
+                        </button>
+                    </p>
+                </>
+            )}
+        </div>
+    );
+}

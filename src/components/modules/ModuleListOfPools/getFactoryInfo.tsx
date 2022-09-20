@@ -5,7 +5,7 @@ import {
     iconService,
     debugService,
     networkId,
-} from '@components/utils/getProviders';
+} from '@components/utils/contract/getProviders';
 
 export async function getFactoryInfo() {
     const factoryAddress = 'cx923993ec24429b97a1eb39af7745fb31121b1905';

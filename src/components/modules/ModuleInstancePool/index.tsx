@@ -3,13 +3,20 @@ import React, {useRef, useState} from 'react';
 import {Pool} from '@convexus/sdk';
 import * as styles from './styles.module.less';
 import * as appStyles from '@components/app/app.module.less';
-import {instanciatePool} from './utils/instanciatePool';
+import {getPoolFromAddress} from '@components/utils/contract/ConvexusPool/getPoolFromAddress';
 import {PoolInfo} from './PoolInfo';
 import {ModuleHeader} from '../ModuleHeader';
 
 export function ModuleInstancePool() {
     const inputRef = useRef<any>();
     const [poolState, setPoolState] = useState<Pool>();
+
+    const onReadPool = () => {
+        const contractAddress = inputRef.current.value;
+        getPoolFromAddress(contractAddress).then((pool) => {
+            setPoolState(pool);
+        });
+    };
 
     return (
         <div className={appStyles.module} id="ModuleInstancePool">
@@ -22,19 +29,10 @@ export function ModuleInstancePool() {
                     ref={inputRef}
                     className={styles.poolContainerInput}
                     type="text"
-                    defaultValue="cx4f5661a3dfaafbc11d13d3ea80474870b37369ca"
+                    defaultValue="cxe5d72412eb7a37a0ad72216089c177c92488b760"
                 />
 
-                <button
-                    onClick={() => {
-                        const contractAddress = inputRef.current.value;
-                        instanciatePool(contractAddress).then((pool) => {
-                            setPoolState(pool);
-                        });
-                    }}
-                >
-                    Read Pool
-                </button>
+                <button onClick={() => onReadPool()}>Read Pool</button>
             </div>
 
             {poolState && <PoolInfo pool={poolState} />}

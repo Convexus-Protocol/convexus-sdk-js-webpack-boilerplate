@@ -7,9 +7,10 @@ import {getFactoryInfo} from './getFactoryInfo';
 export const ModuleListOfPools = () => {
     const [poolsState, setPoolsState] = useState<string[]>([]);
 
-    getFactoryInfo().then((pools) => {
-        setPoolsState(pools);
-    });
+    !poolsState &&
+        getFactoryInfo().then((pools) => {
+            setPoolsState(pools);
+        });
 
     return (
         <div className={appStyles.module} id="ModuleListOfPools">

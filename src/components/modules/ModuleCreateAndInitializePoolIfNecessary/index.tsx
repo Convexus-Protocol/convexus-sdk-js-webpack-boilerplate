@@ -11,6 +11,17 @@ export function ModuleCreateAndInitializePoolIfNecessary() {
     const feeRef = useRef<any>();
     const [txHashResult, setTxHashResult] = useState<string>();
 
+    const onCreateAndInitializerPoolIfNecessary = () => {
+        const tokenA = tokenARef.current.value;
+        const tokenB = tokenBRef.current.value;
+        const fee = parseInt(feeRef.current.value);
+        createAndInitializePoolIfNecessary(tokenA, tokenB, fee).then(
+            (txHash) => {
+                setTxHashResult(txHash);
+            },
+        );
+    };
+
     return (
         <div
             className={appStyles.module}
@@ -45,20 +56,7 @@ export function ModuleCreateAndInitializePoolIfNecessary() {
             </p>
 
             <p>
-                <button
-                    onClick={() => {
-                        const tokenA = tokenARef.current.value;
-                        const tokenB = tokenBRef.current.value;
-                        const fee = parseInt(feeRef.current.value);
-                        createAndInitializePoolIfNecessary(
-                            tokenA,
-                            tokenB,
-                            fee,
-                        ).then((txHash) => {
-                            setTxHashResult(txHash);
-                        });
-                    }}
-                >
+                <button onClick={() => onCreateAndInitializerPoolIfNecessary()}>
                     Create
                 </button>
             </p>
