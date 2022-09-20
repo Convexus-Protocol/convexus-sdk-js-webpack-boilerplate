@@ -2,13 +2,13 @@ import React, {useState} from 'react';
 
 import * as appStyles from '@components/app/app.module.less';
 import {ModuleHeader} from '@src/components/common/ModuleHeader';
-import {getFactoryInfo} from './getFactoryInfo';
+import {getFactoryPools} from './getFactoryPools';
 
 export const ModuleListOfPools = () => {
     const [poolsState, setPoolsState] = useState<any>();
 
     !poolsState &&
-        getFactoryInfo().then((pools) => {
+        getFactoryPools().then((pools) => {
             setPoolsState(pools);
         });
 

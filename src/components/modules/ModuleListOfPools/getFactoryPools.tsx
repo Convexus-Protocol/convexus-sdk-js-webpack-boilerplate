@@ -9,17 +9,17 @@ import {
 } from '@components/utils/contract/getProviders';
 import {getAddressFromBookmark} from '@src/components/utils/contract/getAddressFromBookmark';
 
-export async function getFactoryInfo() {
-    const factoryAddress = getAddressFromBookmark('Factory');
+const factoryAddress = getAddressFromBookmark('Factory');
 
-    const factoryContract = new Contract(
-        factoryAddress,
-        IConvexusFactory,
-        iconService,
-        debugService,
-        networkId,
-    );
+const factoryContract = new Contract(
+    factoryAddress,
+    IConvexusFactory,
+    iconService,
+    debugService,
+    networkId,
+);
 
+export async function getFactoryPools() {
     const poolsSize = parseInt(await factoryContract.poolsSize());
     const indexes = [...Array(poolsSize).keys()]; // range(poolsSize)
     const poolsAddresses = await Promise.all(

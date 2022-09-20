@@ -6,6 +6,7 @@ import {ModuleInstancePool} from '../modules/ModuleInstancePool';
 import {ModuleListOfPools} from '../modules/ModuleListOfPools';
 import {ModuleCreateAndInitializePoolIfNecessary} from '../modules/ModuleCreateAndInitializePoolIfNecessary';
 import {ModuleAddLiquidity} from '../modules/ModuleAddLiquidity';
+import {ModuleListOfPositions} from '../modules/ModuleListOfPositions';
 
 export const App = () => (
     <div className={styles.container}>
@@ -14,5 +15,6 @@ export const App = () => (
         <ModuleListOfPools />
         <ModuleCreateAndInitializePoolIfNecessary />
         <ModuleAddLiquidity />
+        <ModuleListOfPositions />
     </div>
 );
