@@ -1,0 +1,13 @@
+[
+    {
+        "inputs": [],
+        "name": "name",
+        "outputs": [
+            {
+                "type": "str"
+            }
+        ],
+        "readonly": "0x1",
+        "type": "function"
+    }
+]

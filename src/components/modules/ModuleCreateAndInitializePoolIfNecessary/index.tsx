@@ -3,7 +3,9 @@ import React, {useRef, useState} from 'react';
 import * as appStyles from '@components/app/app.module.less';
 import * as styles from './styles.module.less';
 import {createAndInitializePoolIfNecessary} from './createAndInitializePoolIfNecessary';
-import {ModuleHeader} from '../ModuleHeader';
+import {ModuleHeader} from '../../common/ModuleHeader';
+import {getAddressFromBookmark} from '@src/components/utils/contract/getAddressFromBookmark';
+import {TxHashLink} from '@src/components/common/TxHashLink';
 
 export function ModuleCreateAndInitializePoolIfNecessary() {
     const tokenARef = useRef<any>();
@@ -38,7 +40,7 @@ export function ModuleCreateAndInitializePoolIfNecessary() {
                     className={styles.inputAddress}
                     ref={tokenARef}
                     type="text"
-                    defaultValue="cx26a0bf7574f0c7eff197beaed51736954a292f25"
+                    defaultValue={getAddressFromBookmark('WETH')}
                 ></input>
             </p>
             <p>
@@ -47,7 +49,7 @@ export function ModuleCreateAndInitializePoolIfNecessary() {
                     className={styles.inputAddress}
                     ref={tokenBRef}
                     type="text"
-                    defaultValue="cxd57fe1c5e63385f412b814634102609e8a987e3a"
+                    defaultValue={getAddressFromBookmark('CRV')}
                 ></input>
             </p>
             <p>
@@ -64,14 +66,7 @@ export function ModuleCreateAndInitializePoolIfNecessary() {
             {txHashResult && (
                 <p>
                     TxHash:
-                    <a
-                        href={
-                            'https://tracker.berlin.icon.community/transaction/' +
-                            txHashResult
-                        }
-                    >
-                        {txHashResult}
-                    </a>
+                    <TxHashLink txHash={txHashResult} />
                 </p>
             )}
         </div>

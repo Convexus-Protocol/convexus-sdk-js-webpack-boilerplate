@@ -1,11 +1,11 @@
 import React, {useState} from 'react';
 
 import * as appStyles from '@components/app/app.module.less';
-import {ModuleHeader} from '../ModuleHeader';
+import {ModuleHeader} from '@src/components/common/ModuleHeader';
 import {getFactoryInfo} from './getFactoryInfo';
 
 export const ModuleListOfPools = () => {
-    const [poolsState, setPoolsState] = useState<string[]>([]);
+    const [poolsState, setPoolsState] = useState<any>();
 
     !poolsState &&
         getFactoryInfo().then((pools) => {
@@ -19,21 +19,21 @@ export const ModuleListOfPools = () => {
                 name={'ModuleListOfPools'}
             />
 
-            <p>Number of pools: {poolsState.length}</p>
-            <p>Pools addresses:</p>
-            {poolsState.map((poolAddress, i) => (
-                <p key={i}>
-                    -
-                    <a
-                        href={
-                            'https://tracker.berlin.icon.community/contract/' +
-                            poolAddress
-                        }
-                    >
-                        {poolAddress}
-                    </a>
-                </p>
-            ))}
+            <p>Number of pools: {poolsState?.length}</p>
+            {poolsState &&
+                poolsState.map((poolState: any, i: number) => (
+                    <p key={i}>
+                        <a
+                            href={
+                                'https://tracker.berlin.icon.community/contract/' +
+                                poolState.address
+                            }
+                        >
+                            {poolState.address}
+                        </a>{' '}
+                        {poolState.name}
+                    </p>
+                ))}
         </div>
     );
 };

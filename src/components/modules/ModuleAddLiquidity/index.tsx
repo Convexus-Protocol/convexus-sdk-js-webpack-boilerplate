@@ -3,7 +3,7 @@ import JSBI from 'jsbi';
 
 import * as appStyles from '@components/app/app.module.less';
 import * as styles from './styles.module.less';
-import {ModuleHeader} from '../ModuleHeader';
+import {ModuleHeader} from '@src/components/common/ModuleHeader';
 import {Contract} from '@convexus/icon-toolkit';
 import {CurrencyAmount, Token, Percent, MaxUint256} from '@convexus/sdk-core';
 import {NonfungiblePositionManager, Pool, Position} from '@convexus/sdk';
@@ -13,15 +13,18 @@ import {getBalanceOfToken} from '@src/components/utils/contract/Token/getBalance
 import {tryParseTick} from '@src/components/utils/parse/tryParseTick';
 import tryParseCurrencyAmount from '@src/components/utils/parse/tryParseCurrencyAmount';
 import INonfungiblePositionManager from '@src/artifacts/contracts/NonfungiblePositionManager/NonfungiblePositionManager.json';
+import IName from '@src/artifacts/contracts/Name/Name.json';
 import bigDecimal from 'js-big-decimal';
 import {
     iconService,
     debugService,
     networkId,
 } from '@components/utils/contract/getProviders';
+import {getAddressFromBookmark} from '@src/components/utils/contract/getAddressFromBookmark';
+import {TxHashLink} from '@src/components/common/TxHashLink';
 
 export const nonfungiblePositionManagerAddress =
-    'cx468042ae19c14a3a1b7f30794024dbbdc220fce4';
+    getAddressFromBookmark('Position Manager');
 
 export const nonfungiblePositionManagerContract = new Contract(
     nonfungiblePositionManagerAddress,
@@ -31,9 +34,16 @@ export const nonfungiblePositionManagerContract = new Contract(
     networkId,
 );
 
+interface TransactionInfo {
+    hash: string;
+    method: string;
+    name: string;
+}
+
 export function ModuleAddLiquidity() {
     const [pool, setPool] = useState<Pool>();
     const [balances, setBalances] = useState<CurrencyAmount<Token>[]>();
+    const [txs, setTxs] = useState<TransactionInfo[]>();
     const poolAddressRef = useRef<any>();
     const lowerBoundRef = useRef<any>();
     const upperBoundRef = useRef<any>();
@@ -41,27 +51,39 @@ export function ModuleAddLiquidity() {
     const amount1Ref = useRef<any>();
     const wallet = getUserWallet();
 
-    function computeAmounts(fieldChanged: string) {
+    function parseBoundToTick(boundRef: React.MutableRefObject<any>): number {
+        if (!pool) return 0;
+
+        const bound = new bigDecimal(boundRef.current.value);
+
+        return tryParseTick(
+            pool.token0,
+            pool.token1,
+            pool.fee,
+            bound.getValue(),
+        );
+    }
+
+    function onFieldChanged(fieldChanged: string) {
+        // Check inputs
         if (!pool) return;
         if (!lowerBoundRef.current.value) return;
         if (!upperBoundRef.current.value) return;
 
         // Parse and manage lower / upper ticks
         try {
-            const lowerBound = new bigDecimal(lowerBoundRef.current.value);
-            const upperBound = new bigDecimal(upperBoundRef.current.value);
-            const tickLower = tryParseTick(
-                pool.token0,
-                pool.token1,
-                pool.fee,
-                lowerBound.getValue(),
-            );
-            const tickUpper = tryParseTick(
-                pool.token0,
-                pool.token1,
-                pool.fee,
-                upperBound.getValue(),
-            );
+            // Parse
+            const tickLower = parseBoundToTick(lowerBoundRef);
+            const tickUpper = parseBoundToTick(upperBoundRef);
+
+            // Check if lower < upper
+            if (tickLower >= tickUpper) {
+                lowerBoundRef.current.style.border = '1px solid red';
+                upperBoundRef.current.style.border = '1px solid red';
+            } else {
+                lowerBoundRef.current.style.border = '';
+                upperBoundRef.current.style.border = '';
+            }
 
             // if upper bound is lower than pool price, disable amount0
             if (tickUpper < pool.tickCurrent) {
@@ -77,56 +99,28 @@ export function ModuleAddLiquidity() {
                 amount1Ref.current.disabled = true;
                 amount1Ref.current.value = '';
                 return;
-            }
-            {
+            } else {
                 amount1Ref.current.disabled = false;
             }
-        } catch (e) {
-            console.error(e);
-            return;
-        }
 
-        if (!amount0Ref.current.value || !amount1Ref.current.value) return;
-        if (fieldChanged == 'amount0' && !amount0Ref.current.value) return;
-        if (fieldChanged == 'amount1' && !amount1Ref.current.value) return;
+            // ----------------------------------
 
-        // Parse and manage amounts
-        try {
-            const lowerBound = new bigDecimal(lowerBoundRef.current.value);
-            const upperBound = new bigDecimal(upperBoundRef.current.value);
-            const tickLower = tryParseTick(
-                pool.token0,
-                pool.token1,
-                pool.fee,
-                lowerBound.getValue(),
-            );
-            const tickUpper = tryParseTick(
-                pool.token0,
-                pool.token1,
-                pool.fee,
-                upperBound.getValue(),
-            );
-
-            // Look for the other amount
-            const amount0 =
-                fieldChanged == 'amount1'
-                    ? MaxUint256
-                    : tryParseCurrencyAmount(
-                          amount0Ref.current.value,
-                          pool.token0,
-                      ).quotient;
-            const amount1 =
-                fieldChanged == 'amount0'
-                    ? MaxUint256
-                    : tryParseCurrencyAmount(
-                          amount1Ref.current.value,
-                          pool.token1,
-                      ).quotient;
+            // Parse and manage amounts
+            let amount0 = MaxUint256;
+            let amount1 = MaxUint256;
 
             switch (fieldChanged) {
                 // amount0 changed, update amount1
                 case 'amount0':
                     {
+                        // Check inputs
+                        if (!amount0Ref.current.value) return;
+
+                        amount0 = tryParseCurrencyAmount(
+                            amount0Ref.current.value,
+                            pool.token0,
+                        ).quotient;
+
                         const position = Position.fromAmount0({
                             pool: pool,
                             tickLower,
@@ -134,6 +128,7 @@ export function ModuleAddLiquidity() {
                             amount0: amount0,
                             useFullPrecision: true,
                         });
+
                         amount1Ref.current.value =
                             position.amount1.toSignificant();
                     }
@@ -142,6 +137,14 @@ export function ModuleAddLiquidity() {
                 // amount1 changed, update amount0
                 case 'amount1':
                     {
+                        // Check inputs
+                        if (!amount1Ref.current.value) return;
+
+                        amount1 = tryParseCurrencyAmount(
+                            amount1Ref.current.value,
+                            pool.token1,
+                        ).quotient;
+
                         const position = Position.fromAmount1({
                             pool: pool,
                             tickLower,
@@ -158,6 +161,20 @@ export function ModuleAddLiquidity() {
                 case 'lower':
                 case 'upper':
                     {
+                        // Check inputs
+                        if (!amount0Ref.current.value) return;
+                        if (!amount1Ref.current.value) return;
+
+                        amount0 = tryParseCurrencyAmount(
+                            amount0Ref.current.value,
+                            pool.token0,
+                        ).quotient;
+
+                        amount1 = tryParseCurrencyAmount(
+                            amount1Ref.current.value,
+                            pool.token1,
+                        ).quotient;
+
                         const position = Position.fromAmounts({
                             pool: pool,
                             tickLower: tickLower,
@@ -181,6 +198,7 @@ export function ModuleAddLiquidity() {
     }
 
     const onCreatePosition = async () => {
+        // Check inputs
         if (!pool) return;
         if (!amount0Ref.current.value && !amount1Ref.current.value) return;
         if (!lowerBoundRef.current.value) return;
@@ -190,24 +208,17 @@ export function ModuleAddLiquidity() {
             ? tryParseCurrencyAmount(amount0Ref.current.value, pool.token0)
                   .quotient
             : MaxUint256;
+
         const amount1 = amount1Ref.current.value
             ? tryParseCurrencyAmount(amount1Ref.current.value, pool.token1)
                   .quotient
             : MaxUint256;
-        const lowerBound = new bigDecimal(lowerBoundRef.current.value);
-        const upperBound = new bigDecimal(upperBoundRef.current.value);
-        const tickLower = tryParseTick(
-            pool.token0,
-            pool.token1,
-            pool.fee,
-            lowerBound.getValue(),
-        );
-        const tickUpper = tryParseTick(
-            pool.token0,
-            pool.token1,
-            pool.fee,
-            upperBound.getValue(),
-        );
+
+        const tickLower = parseBoundToTick(lowerBoundRef);
+        const tickUpper = parseBoundToTick(upperBoundRef);
+
+        // Check ticks
+        if (tickLower >= tickUpper) return;
 
         let position;
 
@@ -259,15 +270,31 @@ export function ModuleAddLiquidity() {
         );
 
         // deposit tokens & mint the NFT position
-        console.log('Minting position...');
+        const txs = [];
         for (const calldata of calldatas) {
-            console.log('calldata=', calldata);
             const txHash = await nonfungiblePositionManagerContract.buildSend(
                 wallet,
                 calldata,
             );
-            console.log('txHash =', txHash);
-            await iconService.waitTransactionResult(txHash);
+
+            await iconService.getTransactionResult(txHash);
+
+            // Read contract name
+            const nameContract = new Contract(
+                calldata['to'],
+                IName,
+                iconService,
+                debugService,
+                networkId,
+            );
+
+            txs.push({
+                hash: txHash,
+                name: await nameContract.name(),
+                method: calldata['method'],
+            });
+
+            setTxs([...txs]);
         }
     };
 
@@ -284,7 +311,7 @@ export function ModuleAddLiquidity() {
                     ref={poolAddressRef}
                     className={styles.input}
                     type="text"
-                    defaultValue="cxe5d72412eb7a37a0ad72216089c177c92488b760"
+                    defaultValue={getAddressFromBookmark('WETH/CRV Pool')}
                 />
                 <button
                     onClick={() => {
@@ -319,7 +346,7 @@ export function ModuleAddLiquidity() {
                     <p>
                         Lower bound price:
                         <input
-                            onChange={() => computeAmounts('lower')}
+                            onChange={() => onFieldChanged('lower')}
                             ref={lowerBoundRef}
                             className={styles.input}
                             defaultValue={pool.token0Price.asFraction
@@ -332,7 +359,7 @@ export function ModuleAddLiquidity() {
                     <p>
                         Upper bound price:
                         <input
-                            onChange={() => computeAmounts('upper')}
+                            onChange={() => onFieldChanged('upper')}
                             ref={upperBoundRef}
                             className={styles.input}
                             defaultValue={pool.token0Price.asFraction
@@ -346,7 +373,7 @@ export function ModuleAddLiquidity() {
                         {pool.token0.symbol} amount (balance in wallet:{' '}
                         {balances[0].toSignificant(10)}):
                         <input
-                            onChange={() => computeAmounts('amount0')}
+                            onChange={() => onFieldChanged('amount0')}
                             ref={amount0Ref}
                             className={styles.input}
                             type="number"
@@ -357,7 +384,7 @@ export function ModuleAddLiquidity() {
                         {pool.token1.symbol} amount (balance in wallet:{' '}
                         {balances[1].toSignificant(10)}):
                         <input
-                            onChange={() => computeAmounts('amount1')}
+                            onChange={() => onFieldChanged('amount1')}
                             ref={amount1Ref}
                             className={styles.input}
                             type="number"
@@ -373,6 +400,14 @@ export function ModuleAddLiquidity() {
                             Create position
                         </button>
                     </p>
+
+                    {txs &&
+                        txs.map((tx, i) => (
+                            <p key={i}>
+                                - {tx.name}::{tx.method}{' '}
+                                <TxHashLink txHash={tx.hash} />
+                            </p>
+                        ))}
                 </>
             )}
         </div>

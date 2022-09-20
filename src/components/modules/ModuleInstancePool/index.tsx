@@ -5,7 +5,8 @@ import * as styles from './styles.module.less';
 import * as appStyles from '@components/app/app.module.less';
 import {getPoolFromAddress} from '@components/utils/contract/ConvexusPool/getPoolFromAddress';
 import {PoolInfo} from './PoolInfo';
-import {ModuleHeader} from '../ModuleHeader';
+import {ModuleHeader} from '@src/components/common/ModuleHeader';
+import {getAddressFromBookmark} from '@src/components/utils/contract/getAddressFromBookmark';
 
 export function ModuleInstancePool() {
     const inputRef = useRef<any>();
@@ -29,7 +30,7 @@ export function ModuleInstancePool() {
                     ref={inputRef}
                     className={styles.poolContainerInput}
                     type="text"
-                    defaultValue="cxe5d72412eb7a37a0ad72216089c177c92488b760"
+                    defaultValue={getAddressFromBookmark('WETH/CRV Pool')}
                 />
 
                 <button onClick={() => onReadPool()}>Read Pool</button>

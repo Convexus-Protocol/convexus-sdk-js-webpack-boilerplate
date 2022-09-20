@@ -9,9 +9,10 @@ import {
 import IConvexusPoolInitializer from '@src/artifacts/contracts/ConvexusPoolInitializer/ConvexusPoolInitializer.json';
 import {getUserWallet} from '@src/components/utils/contract/getUserWallet';
 import {getTokenFromAddress} from '@src/components/utils/contract/Token/getTokenFromAddress';
+import {getAddressFromBookmark} from '@src/components/utils/contract/getAddressFromBookmark';
 
 export const poolInitializerAddress =
-    'cxbb201b891324246a2c35fbcfb3db67145ab12b3a';
+    getAddressFromBookmark('Pool Initializer');
 
 export const poolInitializerContract = new Contract(
     poolInitializerAddress,

@@ -1,14 +1,17 @@
 import {Contract} from '@convexus/icon-toolkit';
 import IConvexusFactory from '@src/artifacts/contracts/ConvexusFactory/ConvexusFactory.json';
+import IConvexusPool from '@src/artifacts/contracts/ConvexusPool/ConvexusPool.json';
 
 import {
     iconService,
     debugService,
     networkId,
 } from '@components/utils/contract/getProviders';
+import {getAddressFromBookmark} from '@src/components/utils/contract/getAddressFromBookmark';
 
 export async function getFactoryInfo() {
-    const factoryAddress = 'cx923993ec24429b97a1eb39af7745fb31121b1905';
+    const factoryAddress = getAddressFromBookmark('Factory');
+
     const factoryContract = new Contract(
         factoryAddress,
         IConvexusFactory,
@@ -19,5 +22,23 @@ export async function getFactoryInfo() {
 
     const poolsSize = parseInt(await factoryContract.poolsSize());
     const indexes = [...Array(poolsSize).keys()]; // range(poolsSize)
-    return Promise.all(indexes.map((index) => factoryContract.pools(index)));
+    const poolsAddresses = await Promise.all(
+        indexes.map((index) => factoryContract.pools(index)),
+    );
+    const poolsNames = await Promise.all(
+        poolsAddresses.map((poolAddress) => {
+            const poolContract = new Contract(
+                poolAddress,
+                IConvexusPool,
+                iconService,
+                debugService,
+                networkId,
+            );
+            return poolContract.name();
+        }),
+    );
+
+    return poolsAddresses.map((poolAddress, i) => {
+        return {address: poolAddress, name: poolsNames[i]};
+    });
 }
