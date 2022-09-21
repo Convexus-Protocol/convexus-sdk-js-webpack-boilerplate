@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import * as appStyles from '@components/app/app.module.less';
 import {ModuleHeader} from '@src/components/common/ModuleHeader';
@@ -7,10 +7,9 @@ import {getFactoryPools} from './getFactoryPools';
 export const ModuleListOfPools = () => {
     const [poolsState, setPoolsState] = useState<any>();
 
-    !poolsState &&
-        getFactoryPools().then((pools) => {
-            setPoolsState(pools);
-        });
+    useEffect(() => {
+        getFactoryPools().then((pools) => setPoolsState(pools));
+    }, []);
 
     return (
         <div className={appStyles.module} id="ModuleListOfPools">
@@ -30,7 +29,7 @@ export const ModuleListOfPools = () => {
                             }
                         >
                             {poolState.address}
-                        </a>{' '}
+                        </a>
                         {poolState.name}
                     </p>
                 ))}

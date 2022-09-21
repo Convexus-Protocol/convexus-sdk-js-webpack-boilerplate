@@ -1,17 +1,18 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import * as appStyles from '@components/app/app.module.less';
 import {ModuleHeader} from '@src/components/common/ModuleHeader';
-import {TokenIdPosition} from './TokenIdPosition';
+import {TokenIdPosition} from '@src/components/common/TokenIdPosition';
 import {getOwnedTokenIdPositions} from './getOwnedTokenIdPositions';
 
 export const ModuleListOfPositions = () => {
     const [tokenIdPositions, setTokenIdPositions] = useState<any>();
 
-    !tokenIdPositions &&
+    useEffect(() => {
         getOwnedTokenIdPositions().then((tokenIdPositions) =>
             setTokenIdPositions(tokenIdPositions),
         );
+    }, []);
 
     return (
         <div className={appStyles.module} id="ModuleListOfPositions">

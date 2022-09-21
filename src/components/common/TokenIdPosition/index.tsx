@@ -1,7 +1,7 @@
 import React from 'react';
 import * as styles from './styles.module.less';
-import {OutOfRange} from './OutOfRange';
-import {InRange} from './InRange';
+import {OutOfRange} from '@src/components/common/OutOfRange';
+import {InRange} from '@src/components/common/InRange';
 import {Position, tickToPrice} from '@convexus/sdk';
 
 interface TokenIdPositionProps {
@@ -36,6 +36,12 @@ export function TokenIdPosition({tokenId, position}: TokenIdPositionProps) {
 
             <div className={styles.positionPrice}>
                 Min: {priceLower} - Max: {priceUpper}
+            </div>
+
+            <div className={styles.positionAmounts}>
+                {position.amount0.toSignificant()} {position.pool.token0.symbol}{' '}
+                - {position.amount1.toSignificant()}{' '}
+                {position.pool.token1.symbol}
             </div>
 
             <div className={styles.positionRange}>

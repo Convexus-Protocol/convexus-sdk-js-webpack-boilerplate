@@ -16,15 +16,15 @@ export function PoolInfo({pool}: PoolInfoInterface) {
                 Token1: <span>{pool.token1.symbol}</span>
             </p>
             <p>
-                Fee:{' '}
+                Fee:
                 <span>
                     {pool.fee} ({pool.fee / 10000}%)
                 </span>
             </p>
             <p>
-                Price:{' '}
+                Price:
                 <span>
-                    1 {pool.token0.symbol} = {pool.token0Price.toSignificant()}{' '}
+                    1 {pool.token0.symbol} = {pool.token0Price.toSignificant()}
                     {pool.token1.symbol}
                 </span>
             </p>

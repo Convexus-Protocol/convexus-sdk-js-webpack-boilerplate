@@ -12,7 +12,8 @@
       "**/package-lock.json": true,
       "**/tsconfig.tsbuildinfo": true,
       "**/*.lock": true,
-      "**/*.map": true
+      "**/*.map": true,
+      "**/*.d.ts": { "when": "$(basename).ts" }
     },
 	},
 	

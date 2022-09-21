@@ -22,7 +22,7 @@ import {
 } from '@components/utils/contract/getProviders';
 import {getAddressFromBookmark} from '@src/components/utils/contract/getAddressFromBookmark';
 import {TxHashLink} from '@src/components/common/TxHashLink';
-import {TransactionInfo} from '@src/components/utils/contract/TransactionInfo';
+import {TransactionInfo} from '@src/components/common/TransactionInfo';
 
 export const nonfungiblePositionManagerAddress =
     getAddressFromBookmark('Position Manager');
@@ -368,7 +368,7 @@ export function ModuleAddLiquidity() {
                     </p>
 
                     <p>
-                        {pool.token0.symbol} amount (balance in wallet:{' '}
+                        {pool.token0.symbol} amount (balance in wallet:
                         {balances[0].toSignificant(10)}):
                         <input
                             onChange={() => onFieldChanged('amount0')}
@@ -379,7 +379,7 @@ export function ModuleAddLiquidity() {
                     </p>
 
                     <p>
-                        {pool.token1.symbol} amount (balance in wallet:{' '}
+                        {pool.token1.symbol} amount (balance in wallet:
                         {balances[1].toSignificant(10)}):
                         <input
                             onChange={() => onFieldChanged('amount1')}
@@ -402,7 +402,7 @@ export function ModuleAddLiquidity() {
                     {txs &&
                         txs.map((tx, i) => (
                             <p key={i}>
-                                - {tx.name}::{tx.method}{' '}
+                                - {tx.name}::{tx.method}
                                 <TxHashLink txHash={tx.hash} />
                             </p>
                         ))}

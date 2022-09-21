@@ -7,7 +7,7 @@ import {ModuleListOfPools} from '../modules/ModuleListOfPools';
 import {ModuleCreateAndInitializePoolIfNecessary} from '../modules/ModuleCreateAndInitializePoolIfNecessary';
 import {ModuleAddLiquidity} from '../modules/ModuleAddLiquidity';
 import {ModuleListOfPositions} from '../modules/ModuleListOfPositions';
-import {ModuleDeletePosition} from '../modules/ModuleDeletePosition';
+import {ModuleDecreaseLiquidity} from '../modules/ModuleDecreaseLiquidity';
 
 export const App = () => (
     <div className={styles.container}>
@@ -17,6 +17,6 @@ export const App = () => (
         <ModuleCreateAndInitializePoolIfNecessary />
         <ModuleAddLiquidity />
         <ModuleListOfPositions />
-        <ModuleDeletePosition />
+        <ModuleDecreaseLiquidity />
     </div>
 );
