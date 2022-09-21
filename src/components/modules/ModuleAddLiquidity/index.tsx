@@ -339,6 +339,7 @@ export function ModuleAddLiquidity() {
                     <hr />
 
                     <p>
+                        {/* cxf62cfd827aaf7e8b8d03efdd6e367eb97bdc0f44 */}
                         Lower bound price:
                         <input
                             onChange={() => onFieldChanged('lower')}
@@ -346,6 +347,7 @@ export function ModuleAddLiquidity() {
                             className={styles.input}
                             defaultValue={pool.token0Price.asFraction
                                 .divide(2)
+                                .multiply(pool.token0Price.scalar)
                                 .toSignificant(10)}
                             type="number"
                         />
@@ -359,6 +361,7 @@ export function ModuleAddLiquidity() {
                             className={styles.input}
                             defaultValue={pool.token0Price.asFraction
                                 .multiply(2)
+                                .multiply(pool.token0Price.scalar)
                                 .toSignificant(10)}
                             type="number"
                         />
