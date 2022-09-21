@@ -2,16 +2,16 @@ import React, {useState} from 'react';
 
 import * as appStyles from '@components/app/app.module.less';
 import {ModuleHeader} from '@src/components/common/ModuleHeader';
-import {PositionElement} from './PositionElement';
-import {getPositionsInfo} from './getPositionsInfo';
+import {TokenIdPosition} from './TokenIdPosition';
+import {getOwnedTokenIdPositions} from './getOwnedTokenIdPositions';
 
 export const ModuleListOfPositions = () => {
-    const [positions, setPositions] = useState<any>();
+    const [tokenIdPositions, setTokenIdPositions] = useState<any>();
 
-    !positions &&
-        getPositionsInfo().then((positions) => {
-            setPositions(positions);
-        });
+    !tokenIdPositions &&
+        getOwnedTokenIdPositions().then((tokenIdPositions) =>
+            setTokenIdPositions(tokenIdPositions),
+        );
 
     return (
         <div className={appStyles.module} id="ModuleListOfPositions">
@@ -20,9 +20,13 @@ export const ModuleListOfPositions = () => {
                 name={'ModuleListOfPositions'}
             />
 
-            {positions &&
-                positions.map((position: any, key: number) => (
-                    <PositionElement key={key} position={position} />
+            {tokenIdPositions &&
+                tokenIdPositions.map((position: any, key: number) => (
+                    <TokenIdPosition
+                        key={key}
+                        tokenId={position.tokenId}
+                        position={position.position}
+                    />
                 ))}
         </div>
     );

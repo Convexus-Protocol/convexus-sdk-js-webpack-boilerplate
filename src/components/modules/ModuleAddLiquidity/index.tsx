@@ -22,6 +22,7 @@ import {
 } from '@components/utils/contract/getProviders';
 import {getAddressFromBookmark} from '@src/components/utils/contract/getAddressFromBookmark';
 import {TxHashLink} from '@src/components/common/TxHashLink';
+import {TransactionInfo} from '@src/components/utils/contract/TransactionInfo';
 
 export const nonfungiblePositionManagerAddress =
     getAddressFromBookmark('Position Manager');
@@ -33,12 +34,6 @@ export const nonfungiblePositionManagerContract = new Contract(
     debugService,
     networkId,
 );
-
-interface TransactionInfo {
-    hash: string;
-    method: string;
-    name: string;
-}
 
 export function ModuleAddLiquidity() {
     const [pool, setPool] = useState<Pool>();

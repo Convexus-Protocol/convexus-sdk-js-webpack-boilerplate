@@ -18,6 +18,10 @@ const factoryContract = new Contract(
     networkId,
 );
 
-export async function getPool(tokenA: string, tokenB: string, fee: number) {
+export async function getPoolAddress(
+    tokenA: string,
+    tokenB: string,
+    fee: number,
+) {
     return factoryContract.getPool(tokenA, tokenB, fee);
 }
