@@ -3,7 +3,7 @@ import IIRC2 from '@src/artifacts/contracts/IRC2/IRC2.json';
 import {CurrencyAmount, Token, Icx} from '@convexus/sdk-core';
 import {iconService, debugService, networkId} from '../getProviders';
 
-export async function getBalanceOfToken(
+export async function balanceOf(
     token: Token,
     address: string,
 ): Promise<CurrencyAmount<Token>> {

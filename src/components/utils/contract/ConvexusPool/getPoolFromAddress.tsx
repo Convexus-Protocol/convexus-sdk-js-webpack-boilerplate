@@ -1,24 +1,12 @@
-import {Contract} from '@convexus/icon-toolkit';
 import {Token} from '@convexus/sdk-core';
 import {Pool} from '@convexus/sdk';
-import IConvexusPool from '@src/artifacts/contracts/ConvexusPool/ConvexusPool.json';
 import {getPoolImmutables} from './getPoolImmutables';
 import {getPoolState} from './getPoolState';
-import {
-    iconService,
-    debugService,
-    networkId,
-} from '@src/components/utils/contract/getProviders';
 import {getTokenFromAddress} from '@src/components/utils/contract/Token/getTokenFromAddress';
+import {getPoolContract} from './getContract';
 
 export async function getPoolFromAddress(poolAddress: string): Promise<Pool> {
-    const poolContract = new Contract(
-        poolAddress,
-        IConvexusPool,
-        iconService,
-        debugService,
-        networkId,
-    );
+    const poolContract = getPoolContract(poolAddress);
     const [poolImmutables, poolState] = await Promise.all([
         getPoolImmutables(poolContract),
         getPoolState(poolContract),

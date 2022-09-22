@@ -2,34 +2,15 @@ import React, {useEffect, useRef, useState} from 'react';
 
 import * as appStyles from '@components/app/app.module.less';
 import {ModuleHeader} from '@src/components/common/ModuleHeader';
-import {Contract} from '@convexus/icon-toolkit';
 import {NonfungiblePositionManager, Position} from '@convexus/sdk';
 import {Percent, CurrencyAmount} from '@convexus/sdk-core';
 import {getPosition} from '@src/components/utils/contract/NonfungiblePositionManager/getPosition';
 import {getUserWallet} from '@src/components/utils/contract/getUserWallet';
-import {getAddressFromBookmark} from '@src/components/utils/contract/getAddressFromBookmark';
-import INonfungiblePositionManager from '@src/artifacts/contracts/NonfungiblePositionManager/NonfungiblePositionManager.json';
-import IName from '@src/artifacts/contracts/Name/Name.json';
 import {TransactionInfo} from '@src/components/common/TransactionInfo';
-
-import {
-    iconService,
-    debugService,
-    networkId,
-} from '@components/utils/contract/getProviders';
 import {TxHashLink} from '@src/components/common/TxHashLink';
 import {TokenIdPosition} from '@src/components/common/TokenIdPosition';
-
-export const nonfungiblePositionManagerAddress =
-    getAddressFromBookmark('Position Manager');
-
-export const nonfungiblePositionManagerContract = new Contract(
-    nonfungiblePositionManagerAddress,
-    INonfungiblePositionManager,
-    iconService,
-    debugService,
-    networkId,
-);
+import {nonfungiblePositionManagerContract} from '@src/components/utils/contract/NonfungiblePositionManager/getContract';
+import {getNameContract} from '@src/components/utils/contract/Name/getContract';
 
 export const ModuleDecreaseLiquidity = () => {
     const tokenIdRef = useRef<any>();
@@ -64,10 +45,6 @@ export const ModuleDecreaseLiquidity = () => {
         const wallet = getUserWallet();
 
         // Remove the whole liquidity from current position
-        NonfungiblePositionManager.setContractAddress(
-            nonfungiblePositionManagerAddress,
-        );
-
         const calldatas = NonfungiblePositionManager.removeCallParameters(
             position,
             {
@@ -98,18 +75,11 @@ export const ModuleDecreaseLiquidity = () => {
             const txHash = await nonfungiblePositionManagerContract.buildSend(
                 wallet,
                 calldata,
+                true,
             );
-
-            await iconService.getTransactionResult(txHash);
 
             // Read contract name
-            const nameContract = new Contract(
-                calldata['to'],
-                IName,
-                iconService,
-                debugService,
-                networkId,
-            );
+            const nameContract = getNameContract(calldata['to']);
 
             txs.push({
                 hash: txHash,

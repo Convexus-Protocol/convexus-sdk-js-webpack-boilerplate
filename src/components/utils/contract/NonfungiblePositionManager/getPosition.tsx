@@ -1,27 +1,8 @@
-import {getAddressFromBookmark} from '@src/components/utils/contract/getAddressFromBookmark';
-import {Contract} from '@convexus/icon-toolkit';
-import INonfungiblePositionManager from '@src/artifacts/contracts/NonfungiblePositionManager/NonfungiblePositionManager.json';
-import {
-    iconService,
-    debugService,
-    networkId,
-} from '@components/utils/contract/getProviders';
-
 import {getTokenFromAddress} from '@src/components/utils/contract/Token/getTokenFromAddress';
 import {getPoolFromAddress} from '@src/components/utils/contract/ConvexusPool/getPoolFromAddress';
 import {getPoolAddress} from '@src/components/utils/contract/ConvexusFactory/getPoolAddress';
-import {Position, tickToPrice} from '@convexus/sdk';
-
-const nonfungiblePositionManagerAddress =
-    getAddressFromBookmark('Position Manager');
-
-const nonfungiblePositionManagerContract = new Contract(
-    nonfungiblePositionManagerAddress,
-    INonfungiblePositionManager,
-    iconService,
-    debugService,
-    networkId,
-);
+import {Position} from '@convexus/sdk';
+import {nonfungiblePositionManagerContract} from './getContract';
 
 export async function getPosition(tokenId: number) {
     const position = await nonfungiblePositionManagerContract.positions(

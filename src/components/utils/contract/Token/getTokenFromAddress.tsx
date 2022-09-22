@@ -1,5 +1,5 @@
 import {Token, Icx} from '@convexus/sdk-core';
-import {getTokenInfo} from './getTokenInfo';
+import {getIrc2Contract} from './getContract';
 
 export async function getTokenFromAddress(
     tokenAddress: string,
@@ -8,12 +8,18 @@ export async function getTokenFromAddress(
         return new Icx().wrapped;
     }
 
-    const tokenInfo = await getTokenInfo(tokenAddress);
+    const contract = getIrc2Contract(tokenAddress);
+
+    const result = await Promise.all([
+        contract.decimals(),
+        contract.symbol(),
+        contract.name(),
+    ]);
 
     return new Token(
-        tokenInfo.address,
-        tokenInfo.decimals,
-        tokenInfo.symbol,
-        tokenInfo.name,
+        contract.address,
+        parseInt(result[0]),
+        result[1],
+        result[2],
     );
 }

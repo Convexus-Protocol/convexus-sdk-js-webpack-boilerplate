@@ -5,7 +5,7 @@ import * as styles from './styles.module.less';
 import {ModuleHeader} from '@src/components/common/ModuleHeader';
 import {Percent, CurrencyAmount, Token, MaxUint256} from '@convexus/sdk-core';
 import {getUserWallet} from '@src/components/utils/contract/getUserWallet';
-import {getBalanceOfToken} from '@src/components/utils/contract/Token/getBalanceOfToken';
+import {balanceOf} from '@src/components/utils/contract/Token/balanceOf';
 import tryParseCurrencyAmount from '@src/components/utils/parse/tryParseCurrencyAmount';
 import {TxHashLink} from '@src/components/common/TxHashLink';
 import {TransactionInfo} from '@src/components/common/TransactionInfo';
@@ -141,11 +141,11 @@ export function ModuleIncreaseLiquidity() {
         setPosition(position);
 
         // Get balances
-        const balance0 = await getBalanceOfToken(
+        const balance0 = await balanceOf(
             position.pool.token0,
             wallet.getAddress(),
         );
-        const balance1 = await getBalanceOfToken(
+        const balance1 = await balanceOf(
             position.pool.token1,
             wallet.getAddress(),
         );

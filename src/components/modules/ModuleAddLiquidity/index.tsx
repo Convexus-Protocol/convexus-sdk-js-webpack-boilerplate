@@ -3,17 +3,11 @@ import React, {useCallback, useEffect, useRef, useState} from 'react';
 import * as appStyles from '@components/app/app.module.less';
 import * as styles from './styles.module.less';
 import {ModuleHeader} from '@src/components/common/ModuleHeader';
-import {
-    CurrencyAmount,
-    Token,
-    Percent,
-    MaxUint256,
-    Rounding,
-} from '@convexus/sdk-core';
+import {CurrencyAmount, Token, Percent, MaxUint256} from '@convexus/sdk-core';
 import {NonfungiblePositionManager, Pool, Position} from '@convexus/sdk';
 import {getPoolFromAddress} from '@src/components/utils/contract/ConvexusPool/getPoolFromAddress';
 import {getUserWallet} from '@src/components/utils/contract/getUserWallet';
-import {getBalanceOfToken} from '@src/components/utils/contract/Token/getBalanceOfToken';
+import {balanceOf} from '@src/components/utils/contract/Token/balanceOf';
 import tryParseCurrencyAmount from '@src/components/utils/parse/tryParseCurrencyAmount';
 import {getAddressFromBookmark} from '@src/components/utils/contract/getAddressFromBookmark';
 import {TxHashLink} from '@src/components/common/TxHashLink';
@@ -166,14 +160,8 @@ export function ModuleAddLiquidity() {
     const onLoadPool = () => {
         const poolAddress = poolAddressRef.current.value;
         getPoolFromAddress(poolAddress).then(async (pool) => {
-            const balance0 = await getBalanceOfToken(
-                pool.token0,
-                wallet.getAddress(),
-            );
-            const balance1 = await getBalanceOfToken(
-                pool.token1,
-                wallet.getAddress(),
-            );
+            const balance0 = await balanceOf(pool.token0, wallet.getAddress());
+            const balance1 = await balanceOf(pool.token1, wallet.getAddress());
             setPool(pool);
             setBalances([balance0, balance1]);
         });
