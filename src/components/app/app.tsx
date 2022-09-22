@@ -1,7 +1,6 @@
 import React from 'react';
 
 import * as styles from './app.module.less';
-import {ModuleValidateAndParseAddress} from '../modules/ModuleValidateAndParseAddress';
 import {ModuleInstancePool} from '../modules/ModuleInstancePool';
 import {ModuleListOfPools} from '../modules/ModuleListOfPools';
 import {ModuleCreateAndInitializePoolIfNecessary} from '../modules/ModuleCreateAndInitializePoolIfNecessary';
@@ -12,9 +11,8 @@ import {ModuleIncreaseLiquidity} from '../modules/ModuleIncreaseLiquidity';
 
 export const App = () => (
     <div className={styles.container}>
-        <ModuleValidateAndParseAddress />
-        <ModuleInstancePool />
         <ModuleListOfPools />
+        <ModuleInstancePool />
         <ModuleCreateAndInitializePoolIfNecessary />
         <ModuleAddLiquidity />
         <ModuleListOfPositions />

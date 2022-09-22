@@ -22,7 +22,7 @@ export function PoolInfo({pool}: PoolInfoInterface) {
                 </span>
             </p>
             <p>
-                Price: 1 {pool.token0.symbol} ={' '}
+                Price: 1 {pool.token0.symbol} =
                 {pool.token0Price.toSignificant()}
                 {pool.token1.symbol} (sqrtPrice= {pool.sqrtRatioX96.toString()})
             </p>

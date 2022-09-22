@@ -215,7 +215,7 @@ export function ModuleIncreaseLiquidity() {
                             className={styles.input}
                             ref={amount0Ref}
                             onChange={(e) => onAmount0Changed(e.target)}
-                            defaultValue={position.amount0.toSignificant()}
+                            defaultValue={0}
                         />
                     </p>
 
@@ -231,7 +231,7 @@ export function ModuleIncreaseLiquidity() {
                             className={styles.input}
                             ref={amount1Ref}
                             onChange={(e) => onAmount1Changed(e.target)}
-                            defaultValue={position.amount1.toSignificant()}
+                            defaultValue={0}
                         />
                     </p>
 

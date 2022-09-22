@@ -1,5 +1,6 @@
 import React from 'react';
 import * as styles from './styles.module.less';
+import {Rounding} from '@convexus/sdk-core';
 import {OutOfRange} from '@src/components/common/OutOfRange';
 import {InRange} from '@src/components/common/InRange';
 import {Position, tickToPrice} from '@convexus/sdk';
@@ -40,13 +41,17 @@ export function TokenIdPosition({tokenId, position}: TokenIdPositionProps) {
             </div>
 
             <div className={styles.positionPrice}>
-                Min: {priceLower} - Max: {priceUpper}
+                [{priceLower} ↔ {priceUpper}]
             </div>
 
             <div className={styles.positionAmounts}>
-                {amount0.toSignificant()} {position.pool.token0.symbol}-{' '}
-                {amount1.toSignificant()}
-                {position.pool.token1.symbol}
+                {`
+                    ${amount0.toSignificant(6, undefined, Rounding.ROUND_UP)} ${
+                    position.pool.token0.symbol
+                } 
+                  + ${amount1.toSignificant(6, undefined, Rounding.ROUND_UP)} ${
+                    position.pool.token1.symbol
+                }`}
             </div>
 
             <div className={styles.positionRange}>

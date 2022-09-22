@@ -252,6 +252,7 @@ export function ModuleAddLiquidity() {
                             className={styles.input}
                             ref={amount0Ref}
                             onChange={(e) => onAmount0Changed(e.target)}
+                            defaultValue={0}
                         />
                     </p>
 
@@ -265,6 +266,7 @@ export function ModuleAddLiquidity() {
                             className={styles.input}
                             ref={amount1Ref}
                             onChange={(e) => onAmount1Changed(e.target)}
+                            defaultValue={0}
                         />
                     </p>
 
