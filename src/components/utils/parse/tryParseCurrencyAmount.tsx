@@ -11,8 +11,10 @@ export default function tryParseCurrencyAmount<T extends Currency>(
     currency: T,
 ): CurrencyAmount<T> {
     const typedValueParsed = parseUnits(value, currency.decimals).toString();
-    return CurrencyAmount.fromRawAmount(
+    const result = CurrencyAmount.fromRawAmount(
         currency,
         JSBI.BigInt(typedValueParsed),
     );
+
+    return result;
 }

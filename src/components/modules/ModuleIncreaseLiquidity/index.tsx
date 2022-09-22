@@ -3,61 +3,33 @@ import React, {useCallback, useEffect, useRef, useState} from 'react';
 import * as appStyles from '@components/app/app.module.less';
 import * as styles from './styles.module.less';
 import {ModuleHeader} from '@src/components/common/ModuleHeader';
-import {
-    CurrencyAmount,
-    Token,
-    Percent,
-    MaxUint256,
-    Rounding,
-} from '@convexus/sdk-core';
-import {NonfungiblePositionManager, Pool, Position} from '@convexus/sdk';
-import {getPoolFromAddress} from '@src/components/utils/contract/ConvexusPool/getPoolFromAddress';
+import {Percent, CurrencyAmount, Token, MaxUint256} from '@convexus/sdk-core';
 import {getUserWallet} from '@src/components/utils/contract/getUserWallet';
 import {getBalanceOfToken} from '@src/components/utils/contract/Token/getBalanceOfToken';
 import tryParseCurrencyAmount from '@src/components/utils/parse/tryParseCurrencyAmount';
-import {getAddressFromBookmark} from '@src/components/utils/contract/getAddressFromBookmark';
 import {TxHashLink} from '@src/components/common/TxHashLink';
 import {TransactionInfo} from '@src/components/common/TransactionInfo';
-import {tryParsePriceToTick} from '@src/components/utils/parse/tryParsePriceToTick';
+import {getPosition} from '@src/components/utils/contract/NonfungiblePositionManager/getPosition';
+import {NonfungiblePositionManager, Position} from '@convexus/sdk';
+import {TokenIdPosition} from '@src/components/common/TokenIdPosition';
 import {nonfungiblePositionManagerContract} from '@src/components/utils/contract/NonfungiblePositionManager/getContract';
 import {getNameContract} from '@src/components/utils/contract/Name/getContract';
-import classNames from 'classnames/bind';
-let cx = classNames.bind(styles);
 
-export function ModuleAddLiquidity() {
-    const [pool, setPool] = useState<Pool>();
-    const [tickLower, setTickLower] = useState<any>();
-    const [tickUpper, setTickUpper] = useState<any>();
+export function ModuleIncreaseLiquidity() {
+    const [tokenId, setTokenId] = useState<any>();
     const [amount0, setAmount0] = useState<any>();
     const [amount1, setAmount1] = useState<any>();
     const [fieldChanged, setFieldChanged] = useState<any>();
     const [balances, setBalances] = useState<CurrencyAmount<Token>[]>();
     const [txs, setTxs] = useState<TransactionInfo[]>();
     const [position, setPosition] = useState<Position>();
-    const poolAddressRef = useRef<any>();
     const amount0Ref = useRef<any>();
     const amount1Ref = useRef<any>();
     const wallet = getUserWallet();
-
-    const onLowerTickChanged = useCallback(
-        (node: any) => {
-            if (!pool) return;
-            if (!node.value) return;
-            setTickLower(tryParsePriceToTick(pool, node.value));
-            setFieldChanged('lower');
-        },
-        [pool],
-    );
-
-    const onUpperTickChanged = useCallback(
-        (node: any) => {
-            if (!pool) return;
-            if (!node.value) return;
-            setTickUpper(tryParsePriceToTick(pool, node.value));
-            setFieldChanged('upper');
-        },
-        [pool],
-    );
+    const tokenIdRef = useRef<any>();
+    const [currentPosition, setCurrentPosition] = useState<any>();
+    const [initialPosition, setInitialPosition] = useState<any>();
+    const pool = currentPosition?.pool;
 
     const onAmount0Changed = useCallback(
         (node: any) => {
@@ -87,12 +59,7 @@ export function ModuleAddLiquidity() {
         // Check inputs
         if (!fieldChanged) return;
         if (!pool) return;
-        if (!tickLower) return;
-        if (!tickUpper) return;
         if (!amount0 && !amount1) return;
-
-        // Invalid position
-        if (tickLower >= tickUpper) return;
 
         // Parse and manage amounts
         let amount0Pos = fieldChanged != 'amount1' ? amount0 : MaxUint256;
@@ -100,8 +67,8 @@ export function ModuleAddLiquidity() {
 
         const position = Position.fromAmounts({
             pool: pool,
-            tickLower: tickLower,
-            tickUpper: tickUpper,
+            tickLower: currentPosition.tickLower,
+            tickUpper: currentPosition.tickUpper,
             amount0: amount0Pos ?? MaxUint256,
             amount1: amount1Pos ?? MaxUint256,
             useFullPrecision: true,
@@ -124,25 +91,25 @@ export function ModuleAddLiquidity() {
         setFieldChanged(null);
     };
 
-    const onCreatePosition = async () => {
+    const onUpdatePosition = async () => {
         // Check inputs
         if (!position) return;
+        if (!initialPosition) return;
 
-        // Parameters
-        const slippageTolerance = new Percent(100, 100); // don't care about slippage for testing
+        const slippageTolerance = new Percent(100, 100); // Don't care about slippage for testing
         const deadline = Date.now() + 60 * 10; // 10 minute deadline
 
         const calldatas = NonfungiblePositionManager.addCallParameters(
             position,
             {
-                recipient: wallet.getAddress(),
+                tokenId,
                 slippageTolerance,
                 deadline,
             },
         );
 
-        // deposit tokens & mint the NFT position
-        const txs = [];
+        // Send txs
+        const txss: TransactionInfo[] = [];
         for (const calldata of calldatas) {
             const txHash = await nonfungiblePositionManagerContract.buildSend(
                 wallet,
@@ -153,51 +120,61 @@ export function ModuleAddLiquidity() {
             // Read contract name
             const nameContract = getNameContract(calldata['to']);
 
-            txs.push({
+            txss.push({
                 hash: txHash,
                 name: await nameContract.name(),
                 method: calldata['method'],
             });
 
-            setTxs([...txs]);
+            setTxs([...txss]);
         }
     };
 
-    const onLoadPool = () => {
-        const poolAddress = poolAddressRef.current.value;
-        getPoolFromAddress(poolAddress).then(async (pool) => {
-            const balance0 = await getBalanceOfToken(
-                pool.token0,
-                wallet.getAddress(),
-            );
-            const balance1 = await getBalanceOfToken(
-                pool.token1,
-                wallet.getAddress(),
-            );
-            setPool(pool);
-            setBalances([balance0, balance1]);
-        });
+    const onLoadPosition = async () => {
+        if (!tokenIdRef.current.value) return;
+
+        // Get current position
+        const tokenId: number = parseInt(tokenIdRef.current.value);
+        const position = await getPosition(tokenId);
+        setInitialPosition(position);
+        setCurrentPosition(position);
+        setPosition(position);
+
+        // Get balances
+        const balance0 = await getBalanceOfToken(
+            position.pool.token0,
+            wallet.getAddress(),
+        );
+        const balance1 = await getBalanceOfToken(
+            position.pool.token1,
+            wallet.getAddress(),
+        );
+
+        setTokenId(tokenId);
+        setBalances([balance0, balance1]);
     };
 
     return (
-        <div className={appStyles.module} id="ModuleAddLiquidity">
+        <div className={appStyles.module} id="ModuleIncreaseLiquidity">
             <ModuleHeader
-                text={'Add liquidity to a pool'}
-                name={'ModuleAddLiquidity'}
+                text={'Increase liquidity'}
+                name={'ModuleIncreaseLiquidity'}
             />
 
             <p>
-                Pool address:
-                <input
-                    ref={poolAddressRef}
-                    className={styles.input}
-                    type="text"
-                    defaultValue={getAddressFromBookmark('WETH/CRV Pool')}
-                />
-                <button onClick={() => onLoadPool()}>Load pool</button>
+                Token ID: &nbsp;
+                <input type="number" ref={tokenIdRef}></input>
             </p>
 
-            {pool && balances && (
+            <p>
+                <button onClick={() => onLoadPosition()}>Load position</button>
+            </p>
+
+            {position && (
+                <TokenIdPosition tokenId={tokenId} position={initialPosition} />
+            )}
+
+            {balances && position && (
                 <>
                     <p>
                         Pool {pool.token0.symbol + ' / ' + pool.token1.symbol}
@@ -210,17 +187,9 @@ export function ModuleAddLiquidity() {
                         Lower bound price:
                         <input
                             type="number"
-                            // Default lower price: pool.token0Price / 2
-                            defaultValue={pool.token0Price.asFraction
-                                .divide(2)
-                                .multiply(pool.token0Price.scalar)
-                                .toSignificant(10)}
-                            className={cx(
-                                styles.input,
-                                tickLower >= tickUpper ? styles.inputRed : '',
-                            )}
-                            ref={onLowerTickChanged}
-                            onChange={(e) => onLowerTickChanged(e.target)}
+                            disabled
+                            defaultValue={position.token0PriceLower.toSignificant()}
+                            className={styles.input}
                         />
                     </p>
 
@@ -228,17 +197,9 @@ export function ModuleAddLiquidity() {
                         Upper bound price:
                         <input
                             type="number"
-                            // Default upper price: pool.token0Price * 2
-                            defaultValue={pool.token0Price.asFraction
-                                .multiply(2)
-                                .multiply(pool.token0Price.scalar)
-                                .toSignificant(10)}
-                            className={cx(
-                                styles.input,
-                                tickLower >= tickUpper ? styles.inputRed : '',
-                            )}
-                            ref={onUpperTickChanged}
-                            onChange={(e) => onUpperTickChanged(e.target)}
+                            disabled
+                            defaultValue={position.token0PriceUpper.toSignificant()}
+                            className={styles.input}
                         />
                     </p>
 
@@ -248,10 +209,13 @@ export function ModuleAddLiquidity() {
                         <input
                             type="number"
                             // if upper bound is lower than pool price, disable amount0
-                            disabled={tickUpper < pool.tickCurrent}
+                            disabled={
+                                currentPosition.tickUpper < pool.tickCurrent
+                            }
                             className={styles.input}
                             ref={amount0Ref}
                             onChange={(e) => onAmount0Changed(e.target)}
+                            defaultValue={position.amount0.toSignificant()}
                         />
                     </p>
 
@@ -261,20 +225,23 @@ export function ModuleAddLiquidity() {
                         <input
                             type="number"
                             // if upper bound is lower than pool price, disable amount0
-                            disabled={tickLower > pool.tickCurrent}
+                            disabled={
+                                currentPosition.tickLower > pool.tickCurrent
+                            }
                             className={styles.input}
                             ref={amount1Ref}
                             onChange={(e) => onAmount1Changed(e.target)}
+                            defaultValue={position.amount1.toSignificant()}
                         />
                     </p>
 
                     <p>
                         <button
                             onClick={() => {
-                                onCreatePosition();
+                                onUpdatePosition();
                             }}
                         >
-                            Create position
+                            Add liquidity
                         </button>
                     </p>
 

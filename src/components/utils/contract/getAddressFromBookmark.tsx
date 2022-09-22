@@ -1,3 +1,5 @@
+import {NonfungiblePositionManager} from '@convexus/sdk';
+
 export const DEFAULT_BOOKMARK = {
     cxfebfa753e6b8720eb027a92ea7c4d176e737cc4f: 'Factory',
     cx96c66d92281301df9e48dba14cce5ecbac25ad8b: 'BNUSD/ICX Pool',

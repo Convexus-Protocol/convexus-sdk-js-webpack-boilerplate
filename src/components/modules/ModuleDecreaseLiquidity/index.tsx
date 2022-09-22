@@ -59,7 +59,7 @@ export const ModuleDecreaseLiquidity = () => {
         // Get current position
         const tokenId: number = parseInt(tokenIdRef.current.value);
         const position = await getPosition(tokenId);
-        const slippageTolerance = new Percent(5, 100); // 5% slippage
+        const slippageTolerance = new Percent(100, 100); // Don't care about slippage for testing
         const deadline = Date.now() + 60 * 10; // 10 minute deadline
         const wallet = getUserWallet();
 
@@ -156,10 +156,13 @@ export const ModuleDecreaseLiquidity = () => {
                     <p>Reduce liquidity: {liquidityRangePercent}%</p>
                     <p>
                         New position : &nbsp;
-                        {newPosition.amount0.toSignificant()}{' '}
-                        {newPosition.pool.token0.symbol} -{' '}
-                        {newPosition.amount1.toSignificant()}{' '}
-                        {newPosition.pool.token1.symbol}
+                        {`${newPosition.amount0.toSignificant()} ${
+                            newPosition.pool.token0.symbol
+                        }`}
+                        {' | '}
+                        {`${newPosition.amount1.toSignificant()} ${
+                            newPosition.pool.token1.symbol
+                        }`}
                     </p>
                     <p>
                         <input

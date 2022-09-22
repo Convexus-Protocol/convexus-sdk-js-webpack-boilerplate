@@ -26,6 +26,11 @@ export function TokenIdPosition({tokenId, position}: TokenIdPositionProps) {
         position.tickUpper,
     ).toSignificant();
 
+    const {amount0, amount1} = {
+        amount0: position.amount0,
+        amount1: position.amount1,
+    };
+
     return (
         <div className={styles.position}>
             <div className={styles.positionToken}>
@@ -39,8 +44,8 @@ export function TokenIdPosition({tokenId, position}: TokenIdPositionProps) {
             </div>
 
             <div className={styles.positionAmounts}>
-                {position.amount0.toSignificant()} {position.pool.token0.symbol}{' '}
-                - {position.amount1.toSignificant()}{' '}
+                {amount0.toSignificant()} {position.pool.token0.symbol}-{' '}
+                {amount1.toSignificant()}
                 {position.pool.token1.symbol}
             </div>
 

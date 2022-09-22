@@ -1,22 +1,4 @@
-import {getAddressFromBookmark} from '@src/components/utils/contract/getAddressFromBookmark';
-import {Contract} from '@convexus/icon-toolkit';
-import INonfungiblePositionManager from '@src/artifacts/contracts/NonfungiblePositionManager/NonfungiblePositionManager.json';
-import {
-    iconService,
-    debugService,
-    networkId,
-} from '@components/utils/contract/getProviders';
-
-export const nonfungiblePositionManagerAddress =
-    getAddressFromBookmark('Position Manager');
-
-export const nonfungiblePositionManagerContract = new Contract(
-    nonfungiblePositionManagerAddress,
-    INonfungiblePositionManager,
-    iconService,
-    debugService,
-    networkId,
-);
+import {nonfungiblePositionManagerContract} from './getContract';
 
 export async function getAllTokensOfOwner(user: string) {
     const count = parseInt(
