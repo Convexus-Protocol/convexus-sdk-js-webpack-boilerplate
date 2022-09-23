@@ -22,3 +22,9 @@ declare module '*.json' {
 declare const IS_PROD: boolean;
 declare const IS_DEV: boolean;
 declare const IS_DEV_SERVER: boolean;
+
+declare module "styled-components/macro" {
+  export * from "styled-components";
+  import styled from "styled-components";
+  export default styled;
+}
