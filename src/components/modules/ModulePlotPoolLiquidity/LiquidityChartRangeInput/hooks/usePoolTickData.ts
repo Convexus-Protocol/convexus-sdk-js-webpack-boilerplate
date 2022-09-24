@@ -23,39 +23,6 @@ const getActiveTick = (
           TICK_SPACINGS[feeAmount]
         : undefined;
 
-// Fetches all ticks for a given pool
-function useAllTicks(
-    pool: Pool,
-    currencyA: Currency | undefined,
-    currencyB: Currency | undefined,
-    feeAmount: FeeAmount | undefined,
-): {
-    isLoading: boolean;
-    error: unknown;
-    ticks: readonly TickData[] | undefined;
-} {
-    const ticks = [
-        {
-            tick: '65280',
-            liquidityNet: '12646966336838736458210',
-            price0: '683.8055692681353',
-            price1: '0.0014624040004094759',
-        },
-        {
-            tick: '79140',
-            liquidityNet: '-12646966336838736458210',
-            price0: '2734.22777655114',
-            price1: '0.00036573397746012416',
-        },
-    ];
-
-    return {
-        isLoading: false,
-        error: null,
-        ticks: ticks,
-    };
-}
-
 export function usePoolActiveLiquidity(
     pool: Pool,
     currencyA: Currency | undefined,
@@ -63,8 +30,6 @@ export function usePoolActiveLiquidity(
     feeAmount: FeeAmount | undefined,
     ticks: readonly TickData[] | undefined,
 ): {
-    isLoading: boolean;
-    error: any;
     activeTick: number | undefined;
     data: TickProcessed[] | undefined;
 } {
@@ -74,22 +39,15 @@ export function usePoolActiveLiquidity(
         [pool, feeAmount],
     );
 
-    const isLoading = false;
-    const error = null;
-    // const { isLoading, error, ticks } = useAllTicks(pool, currencyA, currencyB, feeAmount)
-
     return useMemo(() => {
         if (
             !currencyA ||
             !currencyB ||
             activeTick === undefined ||
             !ticks ||
-            ticks.length === 0 ||
-            isLoading
+            ticks.length === 0
         ) {
             return {
-                isLoading: isLoading,
-                error,
                 activeTick,
                 data: undefined,
             };
@@ -107,8 +65,6 @@ export function usePoolActiveLiquidity(
             // consider setting a local error
             console.error('TickData pivot not found');
             return {
-                isLoading,
-                error,
                 activeTick,
                 data: undefined,
             };
@@ -148,13 +104,9 @@ export function usePoolActiveLiquidity(
             .concat(activeTickProcessed)
             .concat(subsequentTicks);
 
-        console.log('ticksProcessed=', ticksProcessed);
-
         return {
-            isLoading,
-            error,
             activeTick,
             data: ticksProcessed,
         };
-    }, [currencyA, currencyB, activeTick, pool, ticks, isLoading, error]);
+    }, [currencyA, currencyB, activeTick, pool, ticks]);
 }

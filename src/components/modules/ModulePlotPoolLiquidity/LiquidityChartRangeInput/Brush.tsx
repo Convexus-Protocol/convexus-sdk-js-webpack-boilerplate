@@ -18,7 +18,7 @@ const HandleAccent = styled.path`
     pointer-events: none;
 
     stroke-width: 1.5;
-    stroke: ${({theme}) => theme.deprecated_white};
+    stroke: ${({theme}) => '#FFFFFF'};
     opacity: ${({theme}) => 0.6};
 `;
 

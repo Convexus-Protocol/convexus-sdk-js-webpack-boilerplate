@@ -19,7 +19,7 @@ export function useDensityChartData({
     feeAmount: FeeAmount | undefined;
     ticks: readonly TickData[] | undefined;
 }) {
-    const {isLoading, error, data} = usePoolActiveLiquidity(
+    const {data} = usePoolActiveLiquidity(
         pool,
         currencyA,
         currencyB,
@@ -52,9 +52,7 @@ export function useDensityChartData({
 
     return useMemo(() => {
         return {
-            isLoading,
-            error,
-            formattedData: !isLoading ? formatData() : undefined,
+            formattedData: formatData(),
         };
-    }, [isLoading, error, formatData]);
+    }, [formatData]);
 }

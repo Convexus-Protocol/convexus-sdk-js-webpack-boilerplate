@@ -107,9 +107,9 @@ export default function Zoom({
                 [0, 0],
                 [width, height],
             ])
-            .on('zoom', ({transform}: {transform: ZoomTransform}) =>
-                setZoom(transform),
-            );
+            .on('zoom', ({transform}: {transform: ZoomTransform}) => {
+                setZoom(transform);
+            });
 
         select(svg as Element).call(zoomBehavior.current);
     }, [

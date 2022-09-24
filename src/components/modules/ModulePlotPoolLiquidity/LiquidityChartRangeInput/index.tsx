@@ -1,12 +1,10 @@
-import React, {ReactNode, useCallback, useMemo} from 'react';
-import {BarChart2, CloudOff, Inbox} from 'react-feather';
-
 import {Currency, Price, Token} from '@convexus/sdk-core';
 import {FeeAmount, Pool} from '@convexus/sdk';
 import {AutoColumn, ColumnCenter} from './components/Column';
-import Loader from './components/Loader';
 import {format} from 'd3';
 import {saturate} from 'polished';
+import React, {ReactNode, useCallback, useMemo} from 'react';
+import {BarChart2, Inbox} from 'react-feather';
 import {Bound} from './actions/Bound';
 import styled, {useTheme} from 'styled-components';
 
@@ -82,7 +80,7 @@ export default function LiquidityChartRangeInput({
     interactive,
 }: {
     pool: Pool;
-    ticks: readonly TickData[] | undefined;
+    ticks: TickData[];
     currencyA: Currency | undefined;
     currencyB: Currency | undefined;
     feeAmount?: FeeAmount;
@@ -96,15 +94,15 @@ export default function LiquidityChartRangeInput({
 }) {
     const theme = useTheme();
 
-    const tokenAColor = '#2172E5';
-    const tokenBColor = '#E52172';
+    const tokenAColor = '#FF0000';
+    const tokenBColor = '#2172E5';
 
     const isSorted =
         currencyA &&
         currencyB &&
         currencyA?.wrapped.sortsBefore(currencyB?.wrapped);
 
-    const {isLoading, error, formattedData} = useDensityChartData({
+    const {formattedData} = useDensityChartData({
         pool,
         currencyA,
         currencyB,
@@ -181,15 +179,8 @@ export default function LiquidityChartRangeInput({
         [isSorted, price, ticksAtLimit],
     );
 
-    if (error) {
-        console.error('exception', {
-            description: error.toString(),
-            fatal: false,
-        });
-    }
-
     const isUninitialized =
-        !currencyA || !currencyB || (formattedData === undefined && !isLoading);
+        !currencyA || !currencyB || formattedData === undefined;
 
     return (
         <AutoColumn gap="md" style={{minHeight: '200px'}}>
@@ -197,13 +188,6 @@ export default function LiquidityChartRangeInput({
                 <InfoBox
                     message={'Your position will appear here.'}
                     icon={<Inbox size={56} stroke={'#FFFFFF'} />}
-                />
-            ) : isLoading ? (
-                <InfoBox icon={<Loader size="40px" stroke={'#B2B9D2'} />} />
-            ) : error ? (
-                <InfoBox
-                    message={'Liquidity data not available.'}
-                    icon={<CloudOff size={56} stroke={'#B2B9D2'} />}
                 />
             ) : !formattedData || !price ? (
                 <InfoBox
@@ -223,8 +207,7 @@ export default function LiquidityChartRangeInput({
                             brush: {
                                 handle: {
                                     west:
-                                        saturate(0.1, tokenAColor) ??
-                                        theme.deprecated_red1,
+                                        saturate(0.1, tokenAColor) ?? '#FF8888',
                                     east:
                                         saturate(0.1, tokenBColor) ?? '#2172E5',
                                 },

@@ -19,13 +19,13 @@ export function TokenIdPosition({tokenId, position}: TokenIdPositionProps) {
         position.pool.token0,
         position.pool.token1,
         position.tickLower,
-    ).toSignificant();
+    ).toFixed(3);
 
     const priceUpper = tickToPrice(
         position.pool.token0,
         position.pool.token1,
         position.tickUpper,
-    ).toSignificant();
+    ).toFixed(3);
 
     const {amount0, amount1} = {
         amount0: position.amount0,

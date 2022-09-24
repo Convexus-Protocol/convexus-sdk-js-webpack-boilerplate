@@ -56,39 +56,30 @@ export const BaseButton = styled(RebassButton)<
 
 export const ButtonPrimary = styled(BaseButton)<{redesignFlag?: boolean}>`
     background-color: ${({theme, redesignFlag}) =>
-        redesignFlag ? theme.accentAction : theme.deprecated_primary1};
+        redesignFlag ? theme.accentAction : '#2172E5'};
     font-size: ${({redesignFlag}) => redesignFlag && '20px'};
     font-weight: ${({redesignFlag}) => redesignFlag && '600'};
     padding: ${({redesignFlag}) => redesignFlag && '16px'};
     color: ${({theme, redesignFlag}) =>
         redesignFlag ? theme.accentTextLightPrimary : 'white'};
     &:focus {
-        box-shadow: 0 0 0 1pt
-            ${({theme}) => darken(0.05, theme.deprecated_primary1)};
-        background-color: ${({theme}) =>
-            darken(0.05, theme.deprecated_primary1)};
+        box-shadow: 0 0 0 1pt ${({theme}) => darken(0.05, '#2172E5')};
+        background-color: ${({theme}) => darken(0.05, '#2172E5')};
     }
     &:hover {
-        background-color: ${({theme}) =>
-            darken(0.05, theme.deprecated_primary1)};
+        background-color: ${({theme}) => darken(0.05, '#2172E5')};
     }
     &:active {
-        box-shadow: 0 0 0 1pt
-            ${({theme}) => darken(0.1, theme.deprecated_primary1)};
-        background-color: ${({theme}) =>
-            darken(0.1, theme.deprecated_primary1)};
+        box-shadow: 0 0 0 1pt ${({theme}) => darken(0.1, '#2172E5')};
+        background-color: ${({theme}) => darken(0.1, '#2172E5')};
     }
     &:disabled {
         background-color: ${({theme, altDisabledStyle, disabled}) =>
-            altDisabledStyle
-                ? disabled
-                    ? theme.deprecated_primary1
-                    : '#2C2F36'
-                : '#2C2F36'};
+            altDisabledStyle ? (disabled ? '#2172E5' : '#2C2F36') : '#2C2F36'};
         color: ${({altDisabledStyle, disabled, theme}) =>
             altDisabledStyle
                 ? disabled
-                    ? theme.deprecated_white
+                    ? '#FFFFFF'
                     : theme.deprecated_text2
                 : theme.deprecated_text2};
         cursor: auto;
@@ -170,7 +161,7 @@ export const ButtonGray = styled(BaseButton)`
 
 export const ButtonSecondary = styled(BaseButton)`
     border: 1px solid ${({theme}) => theme.deprecated_primary4};
-    color: ${({theme}) => theme.deprecated_primary1};
+    color: ${({theme}) => '#2172E5'};
     background-color: transparent;
     font-size: 16px;
     border-radius: 12px;
@@ -254,7 +245,7 @@ export const ButtonYellow = styled(BaseButton)<{redesignFlag?: boolean}>`
 
 export const ButtonEmpty = styled(BaseButton)`
     background-color: transparent;
-    color: ${({theme}) => theme.deprecated_primary1};
+    color: ${({theme}) => '#2172E5'};
     display: flex;
     justify-content: center;
     align-items: center;
@@ -390,14 +381,14 @@ export function ButtonDropdownLight({
 
 const ActiveOutlined = styled(ButtonOutlined)`
     border: 1px solid;
-    border-color: ${({theme}) => theme.deprecated_primary1};
+    border-color: ${({theme}) => '#2172E5'};
 `;
 
 const Circle = styled.div`
     height: 17px;
     width: 17px;
     border-radius: 50%;
-    background-color: ${({theme}) => theme.deprecated_primary1};
+    background-color: ${({theme}) => '#2172E5'};
     display: flex;
     align-items: center;
     justify-content: center;
@@ -436,10 +427,7 @@ export function ButtonRadioChecked({
                         {children}
                         <CheckboxWrapper>
                             <Circle>
-                                <ResponsiveCheck
-                                    size={13}
-                                    stroke={theme.deprecated_white}
-                                />
+                                <ResponsiveCheck size={13} stroke={'#FFFFFF'} />
                             </Circle>
                         </CheckboxWrapper>
                     </RowBetween>
