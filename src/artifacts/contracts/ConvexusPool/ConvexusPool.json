@@ -667,7 +667,7 @@
     },
     {
         "inputs": [],
-        "name": "ticksKeysSize",
+        "name": "ticksInitializedSize",
         "outputs": [
             {
                 "type": "int"
@@ -683,7 +683,7 @@
                 "type": "int"
             }
         ],
-        "name": "ticksKeys",
+        "name": "ticksInitialized",
         "outputs": [
             {
                 "type": "int"

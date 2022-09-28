@@ -46,15 +46,17 @@ export function ModulePlotPoolLiquidity() {
         const poolContract = getPoolContract(poolAddress);
 
         // Get all ticksKeys indexes
-        const ticksKeysSize = parseInt(await poolContract.ticksKeysSize());
+        const ticksInitializedSize = parseInt(
+            await poolContract.ticksInitializedSize(),
+        );
 
         // Get all ticks keys
-        const indexes = [...Array(ticksKeysSize).keys()]; // range(ticksKeysSize)
+        const indexes = [...Array(ticksInitializedSize).keys()]; // range(ticksInitializedSize)
 
         // ticks need to be sorted
         const ticks = (
             await Promise.all(
-                indexes.map((index) => poolContract.ticksKeys(index)),
+                indexes.map((index) => poolContract.ticksInitialized(index)),
             )
         )
             .map((t) => parseInt(t))
