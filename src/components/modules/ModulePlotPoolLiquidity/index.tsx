@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import JSBI from 'jsbi';
 
 import * as appStyles from '@components/app/app.module.less';
@@ -29,7 +29,20 @@ export function ModulePlotPoolLiquidity() {
     const onPlotLiquidity = async () => {
         const poolAddress = poolRef.current.value;
         const pool = await getPoolFromAddress(poolAddress);
+        setPool(pool);
+    };
 
+    useEffect(() => {
+        if (!pool) return;
+        if (!poolRef.current) return;
+
+        fetchTicksData(pool).then((ticksData) => {
+            setTicksData(ticksData);
+        });
+    }, [pool]);
+
+    const fetchTicksData = async (pool: Pool) => {
+        const poolAddress = poolRef.current.value;
         const poolContract = getPoolContract(poolAddress);
 
         // Get all ticksKeys indexes
@@ -44,7 +57,7 @@ export function ModulePlotPoolLiquidity() {
                 indexes.map((index) => poolContract.ticksKeys(index)),
             )
         )
-            .map((t) => parseInt(t, 16))
+            .map((t) => parseInt(t))
             .sort((a, b) => a - b);
 
         // Get all ticks data
@@ -63,7 +76,7 @@ export function ModulePlotPoolLiquidity() {
             )
         ).filter((a) => a.initialized == '0x1');
 
-        const parseLiquidityNet = (liquidityNet: string) => {
+        const parseBigInt = (liquidityNet: string) => {
             if (liquidityNet.startsWith('-0x')) {
                 return JSBI.unaryMinus(JSBI.BigInt(liquidityNet.substring(1)));
             } else {
@@ -71,20 +84,19 @@ export function ModulePlotPoolLiquidity() {
             }
         };
 
-        const ticksDataFormatted = ticksData.map((tickData) => {
+        return ticksData.map((tickData) => {
             const tick = tickData.tick;
-            const liquidityNet = parseLiquidityNet(tickData.liquidityNet);
+            const liquidityGross = parseBigInt(tickData.liquidityGross);
+            const liquidityNet = parseBigInt(tickData.liquidityNet);
             const price = tickToPrice(pool.token0, pool.token1, tick);
             return {
                 tick: tick,
+                liquidityGross: liquidityGross,
                 liquidityNet: liquidityNet,
                 price0: price,
                 price1: price.invert(),
             };
         });
-
-        setPool(pool);
-        setTicksData(ticksDataFormatted);
     };
 
     return (
@@ -110,7 +122,7 @@ export function ModulePlotPoolLiquidity() {
 
             {pool && ticksData && (
                 <>
-                    <p>Number of ticks={ticksData.length}</p>
+                    <p>Number of ticks={ticksData?.length ?? 0}</p>
                     <div className={styles.chart}>
                         <LiquidityChartRangeInput
                             pool={pool}

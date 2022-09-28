@@ -6,9 +6,9 @@ import {saturate} from 'polished';
 import React, {ReactNode, useCallback, useMemo} from 'react';
 import {BarChart2, Inbox} from 'react-feather';
 import {Bound} from './actions/Bound';
-import styled, {useTheme} from 'styled-components';
+import styled, {ThemeProvider, useTheme} from 'styled-components';
 
-import {ThemedText} from './theme';
+import {getTheme, ThemedText} from './theme';
 import {Chart} from './Chart';
 import {useDensityChartData} from './hooks';
 import {ZoomLevels} from './types';
@@ -80,7 +80,7 @@ export default function LiquidityChartRangeInput({
     interactive,
 }: {
     pool: Pool;
-    ticks: TickData[];
+    ticks: TickData[] | undefined;
     currencyA: Currency | undefined;
     currencyB: Currency | undefined;
     feeAmount?: FeeAmount;
@@ -92,8 +92,8 @@ export default function LiquidityChartRangeInput({
     onRightRangeInput: (typedValue: string) => void;
     interactive: boolean;
 }) {
-    const theme = useTheme();
-
+    const darkMode = true;
+    const theme = getTheme(darkMode);
     const tokenAColor = '#FF0000';
     const tokenBColor = '#2172E5';
 
@@ -183,45 +183,51 @@ export default function LiquidityChartRangeInput({
         !currencyA || !currencyB || formattedData === undefined;
 
     return (
-        <AutoColumn gap="md" style={{minHeight: '200px'}}>
-            {isUninitialized ? (
-                <InfoBox
-                    message={'Your position will appear here.'}
-                    icon={<Inbox size={56} stroke={'#FFFFFF'} />}
-                />
-            ) : !formattedData || !price ? (
-                <InfoBox
-                    message={'There is no liquidity data.'}
-                    icon={<BarChart2 size={56} stroke={'#B2B9D2'} />}
-                />
-            ) : (
-                <ChartWrapper>
-                    <Chart
-                        data={{series: formattedData, current: price}}
-                        dimensions={{width: 400, height: 200}}
-                        margins={{top: 10, right: 2, bottom: 20, left: 0}}
-                        styles={{
-                            area: {
-                                selection: '#2172E5',
-                            },
-                            brush: {
-                                handle: {
-                                    west:
-                                        saturate(0.1, tokenAColor) ?? '#FF8888',
-                                    east:
-                                        saturate(0.1, tokenBColor) ?? '#2172E5',
-                                },
-                            },
-                        }}
-                        interactive={interactive}
-                        brushLabels={brushLabelValue}
-                        brushDomain={brushDomain}
-                        onBrushDomainChange={onBrushDomainChangeEnded}
-                        zoomLevels={ZOOM_LEVELS[feeAmount ?? FeeAmount.MEDIUM]}
-                        ticksAtLimit={ticksAtLimit}
+        <ThemeProvider theme={theme}>
+            <AutoColumn gap="md" style={{minHeight: '200px'}}>
+                {isUninitialized ? (
+                    <InfoBox
+                        message={'Your position will appear here.'}
+                        icon={<Inbox size={56} stroke={'#FFFFFF'} />}
                     />
-                </ChartWrapper>
-            )}
-        </AutoColumn>
+                ) : !formattedData || !price ? (
+                    <InfoBox
+                        message={'There is no liquidity data.'}
+                        icon={<BarChart2 size={56} stroke={'#B2B9D2'} />}
+                    />
+                ) : (
+                    <ChartWrapper>
+                        <Chart
+                            data={{series: formattedData, current: price}}
+                            dimensions={{width: 400, height: 200}}
+                            margins={{top: 10, right: 2, bottom: 20, left: 0}}
+                            styles={{
+                                area: {
+                                    selection: '#2172E5',
+                                },
+                                brush: {
+                                    handle: {
+                                        west:
+                                            saturate(0.1, tokenAColor) ??
+                                            '#FF8888',
+                                        east:
+                                            saturate(0.1, tokenBColor) ??
+                                            '#2172E5',
+                                    },
+                                },
+                            }}
+                            interactive={interactive}
+                            brushLabels={brushLabelValue}
+                            brushDomain={brushDomain}
+                            onBrushDomainChange={onBrushDomainChangeEnded}
+                            zoomLevels={
+                                ZOOM_LEVELS[feeAmount ?? FeeAmount.MEDIUM]
+                            }
+                            ticksAtLimit={ticksAtLimit}
+                        />
+                    </ChartWrapper>
+                )}
+            </AutoColumn>
+        </ThemeProvider>
     );
 }

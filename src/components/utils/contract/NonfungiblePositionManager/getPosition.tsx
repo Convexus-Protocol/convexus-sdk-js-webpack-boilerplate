@@ -23,7 +23,7 @@ export async function getPosition(tokenId: number) {
     return new Position({
         pool: pool,
         liquidity: position.liquidity,
-        tickLower: parseInt(position.tickLower),
-        tickUpper: parseInt(position.tickUpper),
+        tickLower: parseInt(position.tickLower, 16),
+        tickUpper: parseInt(position.tickUpper, 16),
     });
 }

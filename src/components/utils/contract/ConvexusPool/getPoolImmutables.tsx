@@ -15,8 +15,8 @@ export async function getPoolImmutables(poolContract: Contract) {
         factory,
         token0,
         token1,
-        fee: parseInt(fee, 16),
-        tickSpacing,
+        fee: parseInt(fee),
+        tickSpacing: parseInt(tickSpacing),
         maxLiquidityPerTick,
     };
 
