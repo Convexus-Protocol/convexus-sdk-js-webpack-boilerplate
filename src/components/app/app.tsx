@@ -9,6 +9,7 @@ import {ModuleListOfPositions} from '../modules/ModuleListOfPositions';
 import {ModuleDecreaseLiquidity} from '../modules/ModuleDecreaseLiquidity';
 import {ModuleIncreaseLiquidity} from '../modules/ModuleIncreaseLiquidity';
 import {ModulePlotPoolLiquidity} from '../modules/ModulePlotPoolLiquidity';
+import {ModuleSwap} from '../modules/ModuleSwap';
 
 export const App = () => (
     <div className={styles.container}>
@@ -20,5 +21,6 @@ export const App = () => (
         <ModuleDecreaseLiquidity />
         <ModuleIncreaseLiquidity />
         <ModulePlotPoolLiquidity />
+        <ModuleSwap />
     </div>
 );

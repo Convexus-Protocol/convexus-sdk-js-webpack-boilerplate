@@ -22,8 +22,9 @@
         "post-commit": "git update-index --again"
     },
     "dependencies": {
-        "@convexus/icon-toolkit": "*",
-        "@convexus/sdk": "*",
+        "@convexus/icon-toolkit": "^10.0.0",
+        "@convexus/sdk-core": "^10.0.0",
+        "@convexus/sdk": "^10.0.0",
         "@ethersproject/units": "^5.7.0",
         "@types/classnames": "^2.3.0",
         "@types/d3": "^7.4.0",
