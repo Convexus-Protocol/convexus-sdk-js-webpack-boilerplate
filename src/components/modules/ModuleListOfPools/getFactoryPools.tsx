@@ -1,4 +1,4 @@
-import {factoryContract} from '@src/components/utils/contract/Factory/getContract';
+import {factoryContract} from '@src/components/utils/contract/ConvexusFactory/getContract';
 import {getNameContract} from '@src/components/utils/contract/Name/getContract';
 
 export async function getFactoryPools() {

@@ -1,6 +1,13 @@
 import React, {useRef, useState} from 'react';
 
-import {Pool, Route, SwapQuoter, QuoteResult} from '@convexus/sdk';
+import {
+    Pool,
+    Route,
+    SwapQuoter,
+    QuoteResult,
+    Trade,
+    SwapRouter,
+} from '@convexus/sdk';
 import * as styles from './styles.module.less';
 import * as appStyles from '@components/app/app.module.less';
 import {getPoolFromAddress} from '@components/utils/contract/ConvexusPool/getPoolFromAddress';
@@ -9,12 +16,19 @@ import {getAddressFromBookmark} from '@src/components/utils/contract/getAddressF
 import {
     Currency,
     CurrencyAmount,
+    Percent,
     Price,
     Token,
     TradeType,
 } from '@convexus/sdk-core';
-import {factoryContract} from '@src/components/utils/contract/Factory/getContract';
+import {factoryContract} from '@src/components/utils/contract/ConvexusFactory/getContract';
 import tryParseCurrencyAmount from '@src/components/utils/parse/tryParseCurrencyAmount';
+import {DefaultFactoryProvider} from '@src/components/utils/contract/ConvexusFactory/getPoolAddress';
+import {getUserWallet} from '@src/components/utils/contract/getUserWallet';
+import {swapRouterContract} from '@src/components/utils/contract/SwapRouter/getContract';
+import {getNameContract} from '@src/components/utils/contract/Name/getContract';
+import {TransactionInfo} from '@src/components/common/TransactionInfo';
+import {TxHashLink} from '@src/components/common/TxHashLink';
 
 export function ModuleSwap() {
     const inputRef = useRef<any>();
@@ -24,6 +38,7 @@ export function ModuleSwap() {
     const [priceAfter, setPriceAfter] = useState<Price<Currency, Currency>>();
     const [tokenA, setTokenA] = useState<Token>();
     const [tokenB, setTokenB] = useState<Token>();
+    const [txs, setTxs] = useState<TransactionInfo[]>();
 
     const onReadPool = () => {
         const contractAddress = inputRef.current.value;
@@ -55,7 +70,7 @@ export function ModuleSwap() {
 
         factoryContract
             .buildCall(calldata[0])
-            .then((result) => {
+            .then((result: any) => {
                 const quoteResult = QuoteResult.fromCall(result);
                 amount1Ref.current.value = CurrencyAmount.fromRawAmount(
                     tokenB,
@@ -72,7 +87,7 @@ export function ModuleSwap() {
                 }
                 setPriceAfter(poolPrice);
             })
-            .catch((e) => {
+            .catch(() => {
                 console.error('Not enough liquidity in pool');
             });
     };
@@ -98,7 +113,7 @@ export function ModuleSwap() {
 
         factoryContract
             .buildCall(calldata[0])
-            .then((result) => {
+            .then((result: any) => {
                 const quoteResult = QuoteResult.fromCall(result);
                 amount0Ref.current.value = CurrencyAmount.fromRawAmount(
                     tokenA,
@@ -115,7 +130,7 @@ export function ModuleSwap() {
                 }
                 setPriceAfter(poolPrice);
             })
-            .catch((e) => {
+            .catch(() => {
                 console.error('Not enough liquidity in pool');
             });
     };
@@ -136,7 +151,62 @@ export function ModuleSwap() {
         }
     };
 
-    const onSwap = () => {};
+    const onSwap = () => {
+        if (!pool) return;
+        if (!tokenA || !tokenB) return;
+
+        const amount0 = tryParseCurrencyAmount(
+            amount0Ref.current.value,
+            tokenA,
+        );
+
+        const amount1 = tryParseCurrencyAmount(
+            amount1Ref.current.value,
+            tokenB,
+        );
+
+        const route = new Route([pool], tokenA, tokenB);
+        Trade.createUncheckedTrade(new DefaultFactoryProvider(), {
+            route: route,
+            inputAmount: amount0,
+            outputAmount: amount1,
+            tradeType: TradeType.EXACT_INPUT,
+        }).then(async (trade) => {
+            const wallet = getUserWallet();
+            const slippageTolerance = new Percent(100, 100); // dont care about slippage for testing
+            const recipient = wallet.getAddress();
+            const deadline = Date.now() + 60 * 10; // 10 minute deadline
+
+            const calldatas = SwapRouter.swapCallParameters(trade, {
+                slippageTolerance,
+                recipient,
+                deadline,
+            });
+
+            console.log('calldata=', calldatas);
+
+            // deposit tokens & mint the NFT position
+            const txs = [];
+            for (const calldata of calldatas) {
+                const txHash = await swapRouterContract.buildSend(
+                    wallet,
+                    calldata,
+                    true,
+                );
+
+                // Read contract name
+                const nameContract = getNameContract(calldata['to']);
+
+                txs.push({
+                    hash: txHash,
+                    name: await nameContract.name(),
+                    method: calldata['method'],
+                });
+
+                setTxs([...txs]);
+            }
+        });
+    };
 
     return (
         <div className={appStyles.module} id="ModuleSwap">
@@ -196,6 +266,14 @@ export function ModuleSwap() {
                     </p>
 
                     <button onClick={() => onSwap()}>Swap</button>
+
+                    {txs &&
+                        txs.map((tx: any, i: number) => (
+                            <p key={i}>
+                                - {tx.name}::{tx.method}
+                                <TxHashLink txHash={tx.hash} />
+                            </p>
+                        ))}
                 </div>
             )}
         </div>
