@@ -7,6 +7,7 @@ import * as plugins from './plugins';
 import * as rules from './rules';
 import {isDevServer, isProd} from './utils/env';
 import {arrayFilterEmpty} from './utils/helpers';
+import webpack from 'webpack';
 
 export default {
     context: __dirname,
@@ -40,6 +41,9 @@ export default {
         plugins.definePlugin,
         plugins.forkTsCheckerWebpackPlugin,
         plugins.copyPlugin,
+        new webpack.ProvidePlugin({
+            Buffer: ['buffer', 'Buffer'],
+        }),
     ]),
     resolve: {
         alias: aliasItems,

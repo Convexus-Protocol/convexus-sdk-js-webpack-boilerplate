@@ -22,7 +22,7 @@
         "post-commit": "git update-index --again"
     },
     "dependencies": {
-        "@convexus/sdk": "^1.1.63",
+        "@convexus/sdk": "^1.1.65",
         "@ethersproject/units": "^5.7.0",
         "@types/classnames": "^2.3.0",
         "@types/d3": "^7.4.0",

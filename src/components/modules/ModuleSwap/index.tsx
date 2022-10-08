@@ -21,7 +21,7 @@ import {
     Token,
     TradeType,
 } from '@convexus/sdk-core';
-import {factoryContract} from '@src/components/utils/contract/ConvexusFactory/getContract';
+import {quoterContract} from '@src/components/utils/contract/Quoter/getContract';
 import tryParseCurrencyAmount from '@src/components/utils/parse/tryParseCurrencyAmount';
 import {DefaultFactoryProvider} from '@src/components/utils/contract/ConvexusFactory/getPoolAddress';
 import {getUserWallet} from '@src/components/utils/contract/getUserWallet';
@@ -68,7 +68,7 @@ export function ModuleSwap() {
             TradeType.EXACT_INPUT,
         );
 
-        factoryContract
+        quoterContract
             .buildCall(calldata[0])
             .then((result: any) => {
                 const quoteResult = QuoteResult.fromCall(result);
@@ -111,7 +111,7 @@ export function ModuleSwap() {
             TradeType.EXACT_OUTPUT,
         );
 
-        factoryContract
+        quoterContract
             .buildCall(calldata[0])
             .then((result: any) => {
                 const quoteResult = QuoteResult.fromCall(result);
@@ -182,8 +182,6 @@ export function ModuleSwap() {
                 recipient,
                 deadline,
             });
-
-            console.log('calldata=', calldatas);
 
             // deposit tokens & mint the NFT position
             const txs = [];
