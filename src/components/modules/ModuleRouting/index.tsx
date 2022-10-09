@@ -31,8 +31,13 @@ export function ModuleRouting() {
     const tokenARef = useRef<any>();
     const tokenBRef = useRef<any>();
     const amountRef = useRef<any>();
-    const [trades, setTrades] = useState<Trade<Token, Token, TradeType>[]>();
-    const [amountsOut, setAmountsOut] = useState<CurrencyAmount<Token>[]>();
+    const [tradesAmounts, setTradesAmounts] =
+        useState<
+            ({
+                amountOut: CurrencyAmount<Token>;
+                trade: Trade<Token, Token, TradeType>;
+            } | null)[]
+        >();
     const [txs, setTxs] = useState<TransactionInfo[]>();
     const [swapIndex, setSwapIndex] = useState<number>();
 
@@ -82,6 +87,7 @@ export function ModuleRouting() {
         const amount = tryParseCurrencyAmount(amountRef.current.value, tokenA);
 
         function tradesFromJson(json: any) {
+            console.log('json=', json);
             const poolFactoryProvider = new DefaultFactoryProvider();
             return Promise.all(
                 json.map((j: any) =>
@@ -90,18 +96,26 @@ export function ModuleRouting() {
             );
         }
 
+        // const routerEndpoint = 'https://router.convexus.net'
+        const routerEndpoint = 'http://localhost:8000';
+
         fetch(
-            `https://router.convexus.net/routing/bestTradeExactIn?currencyInAddress=${
+            `${routerEndpoint}/routing/bestTradeExactIn?currencyInAddress=${
                 tokenA.address
             }&currencyOutAddress=${
                 tokenB.address
             }&currencyAmountIn=${amount.quotient.toString()}`,
         )
-            .then((response) => response.json())
+            .then((response) => {
+                if (response.status != 404) {
+                    return response.json();
+                } else {
+                    // Something wrong happened
+                    return [];
+                }
+            })
             .then((data) => {
                 tradesFromJson(data).then(async (trades) => {
-                    setTrades(trades);
-
                     // Estimate amounts out
                     Promise.all(
                         trades.map(
@@ -129,15 +143,25 @@ export function ModuleRouting() {
                                                       quoteResult,
                                                   ).amountOut;
 
-                                        return CurrencyAmount.fromRawAmount(
-                                            tokenB,
-                                            amountOut,
-                                        );
+                                        return {
+                                            trade: trade,
+                                            amountOut:
+                                                CurrencyAmount.fromRawAmount(
+                                                    tokenB,
+                                                    amountOut,
+                                                ),
+                                        };
+                                    })
+                                    .catch(() => {
+                                        console.error('Not enough liquidity');
+                                        return null;
                                     });
                             },
                         ),
-                    ).then((amountsOut) => {
-                        setAmountsOut(amountsOut);
+                    ).then((tradesAmounts) => {
+                        setTradesAmounts(
+                            tradesAmounts.filter((t) => t != null),
+                        );
                     });
                 });
             });
@@ -178,50 +202,65 @@ export function ModuleRouting() {
                 <button onClick={() => onFindRoute()}>Find route</button>
             </p>
 
-            {trades !== null &&
-                trades?.length === 0 &&
+            {tradesAmounts !== null &&
+                tradesAmounts?.length === 0 &&
                 'No route or not enough liquidity found'}
 
-            {trades &&
-                amountsOut &&
-                trades.map((trade: Trade<Token, Token, TradeType>, index) => (
-                    <>
-                        <br />
-                        <p key={'trade-' + index}>Route Path {index + 1}:</p>
-                        <p key={'swap-' + index}>
-                            {trade.swaps[0].route.tokenPath.map(
-                                (token, index: number) => (
-                                    <>
-                                        {token.symbol}{' '}
-                                        {index !=
-                                        trade.swaps[0].route.tokenPath.length -
-                                            1
-                                            ? ' ➡️ '
-                                            : ''}
-                                    </>
-                                ),
-                            )}
-                            <p>
-                                Amount out: {amountsOut[index].toSignificant()}{' '}
-                                {amountsOut[index].currency.symbol}
+            {tradesAmounts &&
+                tradesAmounts.map(
+                    (
+                        tradeAmount: {
+                            amountOut: CurrencyAmount<Token>;
+                            trade: Trade<Token, Token, TradeType>;
+                        },
+                        index,
+                    ) => (
+                        <>
+                            <br />
+                            <p key={'trade-' + index}>
+                                Route Path {index + 1}:
                             </p>
-                            <p>
-                                <button onClick={() => onSwap(trade, index)}>
-                                    Perform this trade
-                                </button>
-                            </p>
+                            <p key={'swap-' + index}>
+                                {tradeAmount.trade.swaps[0].route.tokenPath.map(
+                                    (token, index: number) => (
+                                        <>
+                                            {token.symbol}{' '}
+                                            {index !=
+                                            tradeAmount.trade.swaps[0].route
+                                                .tokenPath.length -
+                                                1
+                                                ? ' ➡️ '
+                                                : ''}
+                                        </>
+                                    ),
+                                )}
+                                <p>
+                                    Amount out:{' '}
+                                    {tradeAmount.amountOut.toSignificant()}{' '}
+                                    {tradeAmount.amountOut.currency.symbol}
+                                </p>
+                                <p>
+                                    <button
+                                        onClick={() =>
+                                            onSwap(tradeAmount.trade, index)
+                                        }
+                                    >
+                                        Perform this trade
+                                    </button>
+                                </p>
 
-                            {txs &&
-                                swapIndex == index &&
-                                txs.map((tx: any, i: number) => (
-                                    <p key={i}>
-                                        - {tx.name}::{tx.method}
-                                        <TxHashLink txHash={tx.hash} />
-                                    </p>
-                                ))}
-                        </p>
-                    </>
-                ))}
+                                {txs &&
+                                    swapIndex == index &&
+                                    txs.map((tx: any, i: number) => (
+                                        <p key={i}>
+                                            - {tx.name}::{tx.method}
+                                            <TxHashLink txHash={tx.hash} />
+                                        </p>
+                                    ))}
+                            </p>
+                        </>
+                    ),
+                )}
         </div>
     );
 }
