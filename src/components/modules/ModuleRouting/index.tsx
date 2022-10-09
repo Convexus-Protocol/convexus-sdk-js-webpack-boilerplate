@@ -31,13 +31,12 @@ export function ModuleRouting() {
     const tokenARef = useRef<any>();
     const tokenBRef = useRef<any>();
     const amountRef = useRef<any>();
-    const [tradesAmounts, setTradesAmounts] =
-        useState<
-            ({
-                amountOut: CurrencyAmount<Token>;
-                trade: Trade<Token, Token, TradeType>;
-            } | null)[]
-        >();
+    const [tradesAmounts, setTradesAmounts] = useState<
+        ({
+            amountOut: CurrencyAmount<Token>;
+            trade: Trade<Token, Token, TradeType>;
+        } | null)[]
+    >();
     const [txs, setTxs] = useState<TransactionInfo[]>();
     const [swapIndex, setSwapIndex] = useState<number>();
 
@@ -96,8 +95,8 @@ export function ModuleRouting() {
             );
         }
 
-        // const routerEndpoint = 'https://router.convexus.net'
-        const routerEndpoint = 'http://localhost:8000';
+        const routerEndpoint = 'https://router.convexus.net';
+        // const routerEndpoint = 'http://localhost:8000';
 
         fetch(
             `${routerEndpoint}/routing/bestTradeExactIn?currencyInAddress=${
