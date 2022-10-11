@@ -1,0 +1,101 @@
+[
+    {
+        "inputs": [
+            {
+                "name": "pool",
+                "type": "Address"
+            },
+            {
+                "name": "recipient",
+                "type": "Address"
+            },
+            {
+                "name": "zeroForOne",
+                "type": "bool"
+            },
+            {
+                "name": "amountSpecified",
+                "type": "int"
+            },
+            {
+                "name": "sqrtPriceLimitX96",
+                "type": "int"
+            },
+            {
+                "name": "data",
+                "type": "bytes"
+            }
+        ],
+        "name": "swap",
+        "outputs": [
+            {
+                "type": "dict"
+            }
+        ],
+        "readonly": "0x1",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "name": "nftManager",
+                "type": "Address"
+            },
+            {
+                "name": "factory",
+                "type": "Address"
+            },
+            {
+                "name": "tokenId",
+                "type": "int"
+            }
+        ],
+        "name": "getOwedFeesNFT",
+        "outputs": [
+            {
+                "type": "dict"
+            }
+        ],
+        "readonly": "0x1",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "name": "user",
+                "type": "Address"
+            },
+            {
+                "name": "pool",
+                "type": "Address"
+            },
+            {
+                "name": "tickLower",
+                "type": "int"
+            },
+            {
+                "name": "tickUpper",
+                "type": "int"
+            }
+        ],
+        "name": "getOwedFees",
+        "outputs": [
+            {
+                "type": "dict"
+            }
+        ],
+        "readonly": "0x1",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "name",
+        "outputs": [
+            {
+                "type": "str"
+            }
+        ],
+        "readonly": "0x1",
+        "type": "function"
+    }
+]
