@@ -1,4 +1,56 @@
 body {
-    background: #141617;
+    background: #192a4e;
     color: white;
+    font-family: Verdana;
+}
+
+button {
+    border-radius: 8px;
+    background: linear-gradient(145deg, #1b2d52, #172645);
+    box-shadow: 1px 1px 2px #111111, -1px -1px 2px #233b6c;
+
+    border-color: #223968;
+    color: white;
+    padding: 10px !important;
+}
+
+button:hover {
+    cursor: pointer;
+}
+
+input {
+    border-radius: 10px;
+    background: #192a4d;
+    box-shadow: inset 1px 1px 4px #0f192e, inset -1px -1px 4px #233b6c;
+
+    border-color: #223968;
+    color: white;
+    margin-top: 10px !important;
+    margin-bottom: 10px !important;
+    padding: 10px;
+}
+
+a {
+    font-family: 'Consolas', 'Courier New', Courier, monospace;
+}
+
+select {
+    border-radius: 10px;
+    background: #192a4d;
+    box-shadow: inset 1px 1px 4px #0f192e, inset -1px -1px 4px #233b6c;
+
+    border-color: #223968;
+    color: white;
+    margin-top: 10px !important;
+    margin-bottom: 10px !important;
+    padding: 10px;
+}
+
+input:disabled {
+    border-radius: 10px;
+    background: linear-gradient(145deg, #1b2d52, #172645);
+    box-shadow: none;
+
+    background: #293a5d;
+    color: #aaaaaa;
 }

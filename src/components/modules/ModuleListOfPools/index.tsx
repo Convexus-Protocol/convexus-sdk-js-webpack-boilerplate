@@ -22,7 +22,6 @@ export const ModuleListOfPools = () => {
             {poolsState &&
                 poolsState.map((poolState: any, i: number) => (
                     <p key={i}>
-                        {poolState.name} :{' '}
                         <a
                             href={
                                 'https://tracker.berlin.icon.community/contract/' +
@@ -31,6 +30,7 @@ export const ModuleListOfPools = () => {
                         >
                             {poolState.address}
                         </a>
+                        : {poolState.name}
                     </p>
                 ))}
         </div>

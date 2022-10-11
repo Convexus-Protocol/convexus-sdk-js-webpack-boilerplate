@@ -25,14 +25,14 @@ export function ModuleInstancePool() {
                 text={'Instanciate a new Pool object'}
                 name={'ModuleInstancePool'}
             />
-            <div className={styles.poolContainer}>
+            <div>
                 <input
                     ref={inputRef}
                     className={styles.poolContainerInput}
                     type="text"
                     defaultValue={getAddressFromBookmark('WETH/CRV Pool')}
                 />
-
+                &nbsp;
                 <button onClick={() => onReadPool()}>Read Pool</button>
             </div>
 

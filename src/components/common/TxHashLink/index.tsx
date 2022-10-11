@@ -3,7 +3,7 @@ import React from 'react';
 export function TxHashLink({txHash}: any) {
     return (
         <>
-            &nbsp; (
+            &nbsp;
             <a
                 href={
                     'https://tracker.berlin.icon.community/transaction/' +
@@ -12,7 +12,6 @@ export function TxHashLink({txHash}: any) {
             >
                 {txHash}
             </a>
-            )
         </>
     );
 }
