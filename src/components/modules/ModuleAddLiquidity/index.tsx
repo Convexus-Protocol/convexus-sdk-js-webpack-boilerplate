@@ -232,7 +232,7 @@ export function ModuleAddLiquidity() {
                 tickUpper !== undefined && (
                     <>
                         <p>
-                            Pool{' '}
+                            Pool
                             {pool.token0.symbol + ' / ' + pool.token1.symbol}
                         </p>
                         <p>Pool price: {pool.token0Price.toSignificant(10)}</p>

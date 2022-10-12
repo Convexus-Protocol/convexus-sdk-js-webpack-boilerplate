@@ -10,6 +10,7 @@ import {
     TradeType,
 } from '@convexus/sdk-core';
 import {
+    Pool,
     QuoteMultiResult,
     QuoteResult,
     SwapQuoter,
@@ -220,10 +221,14 @@ export function ModuleRouting() {
                                 Route Path {index + 1}:
                             </p>
                             <p key={'swap-' + index}>
+                                {console.log(
+                                    'tradeAmount.trade=',
+                                    tradeAmount.trade,
+                                )}
                                 {tradeAmount.trade.swaps[0].route.tokenPath.map(
                                     (token, index: number) => (
                                         <>
-                                            {token.symbol}{' '}
+                                            {token.symbol}
                                             {index !=
                                             tradeAmount.trade.swaps[0].route
                                                 .tokenPath.length -
@@ -234,8 +239,25 @@ export function ModuleRouting() {
                                     ),
                                 )}
                                 <p>
-                                    Amount out:{' '}
-                                    {tradeAmount.amountOut.toSignificant()}{' '}
+                                    {tradeAmount.trade.swaps[0].route.pools.map(
+                                        (pool: Pool, index: number) => (
+                                            <>
+                                                {pool.token0.symbol}/
+                                                {pool.token1.symbol} (
+                                                {pool.fee / 1000}%)
+                                                {index !=
+                                                tradeAmount.trade.swaps[0].route
+                                                    .pools.length -
+                                                    1
+                                                    ? ' ➡️ '
+                                                    : ''}
+                                            </>
+                                        ),
+                                    )}
+                                </p>
+                                <p>
+                                    Amount out:
+                                    {tradeAmount.amountOut.toSignificant()}
                                     {tradeAmount.amountOut.currency.symbol}
                                 </p>
                                 <p>

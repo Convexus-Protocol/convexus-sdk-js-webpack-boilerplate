@@ -190,10 +190,12 @@ export const ModuleListOfPositions = () => {
                                     Claim fees
                                 </button>
                                 &nbsp;
-                                {posInfo.owed0.toSignificant(4)}{' '}
-                                {posInfo.position.pool.token0.symbol} /{' '}
-                                {posInfo.owed1.toSignificant(4)}{' '}
-                                {posInfo.position.pool.token1.symbol}
+                                {`
+                                    ${posInfo.owed0.toSignificant(4)}
+                                    ${posInfo.position.pool.token0.symbol} / 
+                                    ${posInfo.owed1.toSignificant(4)}
+                                    ${posInfo.position.pool.token1.symbol}
+                                `}
                             </p>
                             <br />
                             <p>

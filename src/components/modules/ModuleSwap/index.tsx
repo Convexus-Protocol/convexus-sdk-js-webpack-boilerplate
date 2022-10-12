@@ -221,10 +221,10 @@ export function ModuleSwap() {
             {pool && tokenA && tokenB && (
                 <div className={styles.swapContainer}>
                     <p>
-                        Current price: 1 {tokenA.symbol} ={' '}
+                        Current price: 1 {tokenA.symbol} =
                         {tokenA.equals(pool.token0)
                             ? pool.token0Price.toSignificant()
-                            : pool.token1Price.toSignificant()}{' '}
+                            : pool.token1Price.toSignificant()}
                         {tokenB.symbol}
                     </p>
 
@@ -253,7 +253,7 @@ export function ModuleSwap() {
                     </p>
 
                     <p>
-                        Price after:{' '}
+                        Price after:
                         {priceAfter
                             ? `1 ${
                                   tokenA.symbol
