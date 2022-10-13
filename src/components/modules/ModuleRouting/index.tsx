@@ -244,7 +244,7 @@ export function ModuleRouting() {
                                             <>
                                                 {pool.token0.symbol}/
                                                 {pool.token1.symbol} (
-                                                {pool.fee / 1000}%)
+                                                {pool.fee / 10000}%)
                                                 {index !=
                                                 tradeAmount.trade.swaps[0].route
                                                     .pools.length -
