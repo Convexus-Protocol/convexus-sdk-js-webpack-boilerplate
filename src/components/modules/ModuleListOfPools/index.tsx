@@ -11,6 +11,10 @@ export const ModuleListOfPools = () => {
         getFactoryPools().then((pools) => setPoolsState(pools));
     }, []);
 
+    const copyToClipboard = async (address: string) => {
+        await navigator.clipboard.writeText(address);
+    };
+
     return (
         <div className={appStyles.module} id="ModuleListOfPools">
             <ModuleHeader
@@ -22,6 +26,12 @@ export const ModuleListOfPools = () => {
             {poolsState &&
                 poolsState.map((poolState: any, i: number) => (
                     <p key={i}>
+                        <button
+                            onClick={() => copyToClipboard(poolState.address)}
+                        >
+                            Copy
+                        </button>{' '}
+                        &nbsp;
                         <a
                             href={
                                 'https://tracker.berlin.icon.community/contract/' +

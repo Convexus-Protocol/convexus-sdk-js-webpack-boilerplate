@@ -22,7 +22,7 @@ export function ModuleInstancePool() {
     return (
         <div className={appStyles.module} id="ModuleInstancePool">
             <ModuleHeader
-                text={'Instanciate a new Pool object'}
+                text={'Show Pool information'}
                 name={'ModuleInstancePool'}
             />
             <div>
