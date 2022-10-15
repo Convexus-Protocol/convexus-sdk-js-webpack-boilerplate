@@ -96,8 +96,8 @@ export function ModuleRouting() {
             );
         }
 
-        const routerEndpoint = 'https://router.convexus.net';
-        // const routerEndpoint = 'http://localhost:8000';
+        // const routerEndpoint = 'https://router.convexus.net';
+        const routerEndpoint = 'http://localhost:8000';
 
         fetch(
             `${routerEndpoint}/routing/bestTradeExactIn?currencyInAddress=${
