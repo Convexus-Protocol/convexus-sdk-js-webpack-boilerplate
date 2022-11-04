@@ -45,6 +45,8 @@ export function ModuleAddLiquidity() {
     const poolAddressRef = useRef<any>();
     const amount0Ref = useRef<any>();
     const amount1Ref = useRef<any>();
+    const lowerTickRef = useRef<any>();
+    const upperTickRef = useRef<any>();
     const wallet = getUserWallet();
 
     const onLowerTickChanged = (node: any) => {
@@ -171,40 +173,55 @@ export function ModuleAddLiquidity() {
         getPoolFromAddress(poolAddress).then(async (pool) => {
             const balance0 = await balanceOf(pool.token0, wallet.getAddress());
             const balance1 = await balanceOf(pool.token1, wallet.getAddress());
+
             setPool(pool);
             setBalances([balance0, balance1]);
 
             // Initial lower tick : price / 2
             const lowerPrice = pool.token0Price.asFraction.divide(2);
-            setTickLower(
-                nearestUsableTick(
-                    priceToClosestTick(
-                        new Price(
-                            pool.token0,
-                            pool.token1,
-                            lowerPrice.denominator,
-                            lowerPrice.numerator,
-                        ),
+            const tickLower = nearestUsableTick(
+                priceToClosestTick(
+                    new Price(
+                        pool.token0,
+                        pool.token1,
+                        lowerPrice.denominator,
+                        lowerPrice.numerator,
                     ),
-                    TICK_SPACINGS[pool.fee],
                 ),
+                TICK_SPACINGS[pool.fee],
             );
+
+            setTickLower(tickLower);
 
             // Initial upper tick : price * 2
             const upperPrice = pool.token0Price.asFraction.multiply(2);
-            setTickUpper(
-                nearestUsableTick(
-                    priceToClosestTick(
-                        new Price(
-                            pool.token0,
-                            pool.token1,
-                            upperPrice.denominator,
-                            upperPrice.numerator,
-                        ),
+            const tickUpper = nearestUsableTick(
+                priceToClosestTick(
+                    new Price(
+                        pool.token0,
+                        pool.token1,
+                        upperPrice.denominator,
+                        upperPrice.numerator,
                     ),
-                    TICK_SPACINGS[pool.fee],
                 ),
+                TICK_SPACINGS[pool.fee],
             );
+            setTickUpper(tickUpper);
+
+            lowerTickRef.current.value = tickToPrice(
+                pool.token0,
+                pool.token1,
+                tickLower,
+            ).toSignificant();
+
+            upperTickRef.current.value = tickToPrice(
+                pool.token0,
+                pool.token1,
+                tickUpper,
+            ).toSignificant();
+
+            amount0Ref.current.value = 0;
+            amount1Ref.current.value = 0;
         });
     };
 
@@ -232,9 +249,9 @@ export function ModuleAddLiquidity() {
                 tickUpper !== undefined && (
                     <>
                         <p>
-                            Pool
-                            {pool.token0.symbol + ' / ' + pool.token1.symbol}
+                            {`Pool ${pool.token0.symbol} / ${pool.token1.symbol}`}
                         </p>
+
                         <p>Pool price: {pool.token0Price.toSignificant(10)}</p>
 
                         <hr />
@@ -243,11 +260,7 @@ export function ModuleAddLiquidity() {
                             Lower bound price:
                             <input
                                 type="number"
-                                defaultValue={tickToPrice(
-                                    pool.token0,
-                                    pool.token1,
-                                    tickLower,
-                                ).toSignificant()}
+                                ref={lowerTickRef}
                                 className={cx(
                                     styles.input,
                                     tickLower >= tickUpper
@@ -262,11 +275,7 @@ export function ModuleAddLiquidity() {
                             Upper bound price:
                             <input
                                 type="number"
-                                defaultValue={tickToPrice(
-                                    pool.token0,
-                                    pool.token1,
-                                    tickUpper,
-                                ).toSignificant()}
+                                ref={upperTickRef}
                                 className={cx(
                                     styles.input,
                                     tickLower >= tickUpper
@@ -287,7 +296,6 @@ export function ModuleAddLiquidity() {
                                 className={styles.input}
                                 ref={amount0Ref}
                                 onChange={(e) => onAmount0Changed(e.target)}
-                                defaultValue={0}
                             />
                         </p>
 
@@ -301,7 +309,6 @@ export function ModuleAddLiquidity() {
                                 className={styles.input}
                                 ref={amount1Ref}
                                 onChange={(e) => onAmount1Changed(e.target)}
-                                defaultValue={0}
                             />
                         </p>
 
