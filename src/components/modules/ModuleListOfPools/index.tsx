@@ -34,7 +34,7 @@ export const ModuleListOfPools = () => {
                         &nbsp;
                         <a
                             href={
-                                'https://tracker.berlin.icon.community/contract/' +
+                                'https://tracker.lisbon.icon.community/contract/' +
                                 poolState.address
                             }
                         >

@@ -1,10 +1,10 @@
 import IconService from 'icon-sdk-js';
 
 const httpProvider = new IconService.HttpProvider(
-    'https://berlin.net.solidwallet.io/api/v3',
+    'https://lisbon.net.solidwallet.io/api/v3',
 );
 const debugProvider = new IconService.HttpProvider(
-    'https://berlin.net.solidwallet.io/api/v3d',
+    'https://lisbon.net.solidwallet.io/api/v3d',
 );
 
 export const networkId = 7;

@@ -6,7 +6,7 @@ export function TxHashLink({txHash}: any) {
             &nbsp;
             <a
                 href={
-                    'https://tracker.berlin.icon.community/transaction/' +
+                    'https://tracker.lisbon.icon.community/transaction/' +
                     txHash
                 }
             >
